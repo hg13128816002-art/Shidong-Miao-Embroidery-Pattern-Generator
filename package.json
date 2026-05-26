@@ -1,0 +1,10 @@
+{
+  "name": "shidong-miao-embroidery-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Interactive web app for composing Shidong Miao embroidery-inspired patterns.",
+  "scripts": {
+    "dev": "python3 -m http.server 5173",
+    "start": "python3 -m http.server 5173"
+  }
+}

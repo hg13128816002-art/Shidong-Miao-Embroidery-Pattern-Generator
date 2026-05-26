@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="施洞苗绣纹样生成器：选择纹样、配色、构图与刺绣质感，组合生成个性化苗族刺绣风格图案。"
+    />
+    <title>施洞苗绣纹样生成器</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="施洞苗绣纹样生成器">
+          <span>
+            <strong>施洞苗绣纹样生成器</strong>
+            <small>纹样组合 · 数字再创作 · 非遗传播</small>
+          </span>
+        </a>
+
+        <div class="top-actions">
+          <button class="button button-primary" id="randomizeButton" type="button">
+            <span aria-hidden="true">↻</span>
+            生成纹样
+          </button>
+          <button class="button" id="downloadButton" type="button">
+            <span aria-hidden="true">↓</span>
+            下载 PNG
+          </button>
+          <button class="button" id="shareButton" type="button">
+            <span aria-hidden="true">↗</span>
+            分享
+          </button>
+        </div>
+      </header>
+
+      <main class="studio" aria-label="纹样生成工作台">
+        <section class="panel controls" aria-label="纹样控制">
+          <div class="panel-head">
+            <h2>创作控制</h2>
+            <span id="seedLabel">Seed</span>
+          </div>
+
+          <nav class="control-tabs" aria-label="控制分类">
+            <button type="button" data-control-tab="preset">预设</button>
+            <button type="button" data-control-tab="motif">纹样</button>
+            <button type="button" data-control-tab="style">风格</button>
+            <button type="button" data-control-tab="detail">细节</button>
+          </nav>
+
+          <section class="control-block" data-control-panel="preset">
+            <h3>创作预设</h3>
+            <div class="preset-grid" id="presetControls"></div>
+          </section>
+
+          <section class="control-block" data-control-panel="motif">
+            <h3>纹样元素</h3>
+            <div class="motif-grid" id="motifControls"></div>
+          </section>
+
+          <section class="control-block" data-control-panel="style">
+            <h3>构图</h3>
+            <div class="segmented" id="layoutControls"></div>
+
+            <h3>色板</h3>
+            <div class="palette-grid" id="paletteControls"></div>
+
+            <h3>刺绣质感</h3>
+            <div class="texture-grid" id="textureControls"></div>
+          </section>
+
+          <section class="control-block compact-controls" data-control-panel="detail">
+            <h3>细节调节</h3>
+            <label class="range-row">
+              <span>繁密度</span>
+              <input id="densityInput" type="range" min="0.15" max="1" step="0.01" />
+              <output id="densityValue"></output>
+            </label>
+            <label class="range-row">
+              <span>变化度</span>
+              <input id="complexityInput" type="range" min="0.1" max="1" step="0.01" />
+              <output id="complexityValue"></output>
+            </label>
+
+            <div class="toggles">
+              <label>
+                <input id="symmetryInput" type="checkbox" />
+                <span>镜像对称</span>
+              </label>
+              <label>
+                <input id="borderInput" type="checkbox" />
+                <span>边饰环绕</span>
+              </label>
+            </div>
+          </section>
+        </section>
+
+        <section class="stage" aria-label="纹样画布">
+          <div class="stage-toolbar">
+            <div>
+              <strong id="pieceTitle">数字纹样</strong>
+              <span id="pieceMeta"></span>
+            </div>
+            <button class="icon-button" id="resetButton" type="button" aria-label="恢复初始纹样" title="恢复初始纹样">
+              ↺
+            </button>
+          </div>
+          <div class="pattern-frame">
+            <div id="patternOutput" class="pattern-output" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <aside class="panel culture" aria-label="文化说明">
+          <div class="panel-head">
+            <h2>纹样说明</h2>
+            <span>施洞苗绣</span>
+          </div>
+
+          <section class="culture-feature">
+            <p id="cultureIntro"></p>
+          </section>
+
+          <section class="culture-list" id="cultureList"></section>
+
+          <section class="culture-note">
+            <h3>生成声明</h3>
+            <p>
+              当前图案是基于施洞苗绣常见题材、构图和针法质感的数字化再创作，不等同于传统母花本原件或传承人作品。
+            </p>
+          </section>
+        </aside>
+      </main>
+
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
