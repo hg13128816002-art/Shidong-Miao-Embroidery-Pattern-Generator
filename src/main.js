@@ -518,7 +518,7 @@ function syncControls() {
     input.closest(".motif-choice")?.classList.toggle("is-disabled", input.disabled);
     input.closest(".motif-choice")?.setAttribute(
       "title",
-      input.disabled ? "枫香树纹仅在节庆满绣预设中作为中心纹样使用" : "",
+      input.disabled ? "枫香树纹仅用于团花中心，可从节庆满绣预设启用" : "",
     );
   });
 
@@ -553,11 +553,7 @@ function enforceMapleMotifRules() {
 }
 
 function isMapleMotifAllowed() {
-  return getActivePresetId() === MAPLE_PRESET_ID;
-}
-
-function isFestivalFullConfig(config) {
-  return config.layout === "radial" && config.motifs.includes(SPECIAL_MAPLE_MOTIF);
+  return state.layout === "radial" && state.motifs.includes(SPECIAL_MAPLE_MOTIF);
 }
 
 function getSupportingMotifs(selected) {
@@ -718,26 +714,42 @@ function buildLayout(config, colors, rng) {
 }
 
 function buildRadialLayout(config, colors, rng) {
-  if (isFestivalFullConfig(config)) return buildFestivalRadialLayout(config, colors, rng);
-
   const selected = config.motifs;
+  const hasMapleCenter = selected.includes(SPECIAL_MAPLE_MOTIF);
   const supportingMotifs = getSupportingMotifs(selected);
   const ringCount = Math.round(8 + config.density * 8);
   const innerCount = config.density > 0.52 ? 6 : 4;
-  const center = supportingMotifs[0];
+  const center = hasMapleCenter ? SPECIAL_MAPLE_MOTIF : supportingMotifs[0];
+  const frameRadius = hasMapleCenter ? 344 : 318;
   let svg = "";
 
-  svg += buildRadialBloomBed(450, 450, 132, 318, colors, config.texture, 12, 0.34);
-  svg += placeMotif(center, 450, 450, 1.18 + config.complexity * 0.28, 0, colors, config.texture, rng, 0);
+  svg += buildRadialBloomBed(
+    450,
+    450,
+    hasMapleCenter ? 154 : 132,
+    frameRadius,
+    colors,
+    config.texture,
+    hasMapleCenter ? 16 : 12,
+    hasMapleCenter ? 0.36 : 0.34,
+  );
+
+  if (hasMapleCenter) {
+    svg += `<circle cx="450" cy="450" r="326" fill="${colors.dark}" opacity="0.08" />`;
+    svg += `<circle cx="450" cy="450" r="238" fill="${colors.light}" opacity="0.045" />`;
+    svg += threadPath("M210 450 C260 360 340 292 450 276 C560 292 640 360 690 450 C640 540 560 608 450 624 C340 608 260 540 210 450Z", colors.secondary, 5.2, config.texture, `opacity="0.62"`);
+    svg += threadPath("M450 196 C520 252 588 314 704 450 C588 586 520 648 450 704 C380 648 312 586 196 450 C312 314 380 252 450 196Z", colors.accent, 3.6, "continuous", `opacity="0.54"`);
+  }
 
   for (let i = 0; i < innerCount; i += 1) {
     const angle = (Math.PI * 2 * (i + 0.5)) / innerCount;
     const motif = supportingMotifs[(i + 2) % supportingMotifs.length];
+    const radius = hasMapleCenter ? 202 : 178;
     svg += placeMotif(
       motif,
-      450 + Math.cos(angle) * 178,
-      450 + Math.sin(angle) * 178,
-      0.34 + config.complexity * 0.1,
+      450 + Math.cos(angle) * radius,
+      450 + Math.sin(angle) * radius,
+      hasMapleCenter ? 0.34 + config.complexity * 0.1 : 0.34 + config.complexity * 0.1,
       config.symmetry ? (angle * 180) / Math.PI : rng() * 360,
       colors,
       config.texture,
@@ -748,9 +760,9 @@ function buildRadialLayout(config, colors, rng) {
 
   for (let i = 0; i < ringCount; i += 1) {
     const angle = (Math.PI * 2 * i) / ringCount;
-    const radius = 266 + (i % 2 ? 22 : -8) + wave(i, rng) * 8;
+    const radius = (hasMapleCenter ? 284 : 266) + (i % 2 ? 22 : -8) + wave(i, rng) * 8;
     const motif = supportingMotifs[(i + 1) % supportingMotifs.length];
-    const scale = 0.54 + config.complexity * 0.15 + rng() * 0.04;
+    const scale = (hasMapleCenter ? 0.5 : 0.54) + config.complexity * 0.15 + rng() * 0.04;
     svg += placeMotif(
       motif,
       450 + Math.cos(angle) * radius,
@@ -764,51 +776,13 @@ function buildRadialLayout(config, colors, rng) {
     );
   }
 
-  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(7 + config.density * 6));
-  return svg;
-}
+  svg += placeMotif(center, 450, 450, hasMapleCenter ? 1.16 + config.complexity * 0.18 : 1.18 + config.complexity * 0.28, 0, colors, config.texture, rng, 0);
 
-function buildFestivalRadialLayout(config, colors, rng) {
-  const selected = getSupportingMotifs(config.motifs);
-  const motif = (preferred, fallback = 0) => (selected.includes(preferred) ? preferred : selected[fallback % selected.length]);
-  const anchorMotifs = [
-    [motif("flower", 0), 450, 190, 0.62, 0],
-    [motif("butterfly", 1), 710, 450, 0.6, 90],
-    [motif("flower", 2), 450, 710, 0.62, 180],
-    [motif("butterfly", 3), 190, 450, 0.6, -90],
-    [motif("dragon", 0), 292, 292, 0.5, -36],
-    [motif("fish", 1), 608, 292, 0.5, 36],
-    [motif("fish", 2), 608, 608, 0.5, 144],
-    [motif("horn", 3), 292, 608, 0.46, -144],
-  ];
-  const outerBlooms = [
-    [motif("flower", 0), 450, 124, 0.24, 0],
-    [motif("horn", 1), 680, 220, 0.22, 42],
-    [motif("flower", 2), 776, 450, 0.24, 90],
-    [motif("horn", 3), 680, 680, 0.22, 138],
-    [motif("flower", 1), 450, 776, 0.24, 180],
-    [motif("horn", 2), 220, 680, 0.22, -138],
-    [motif("flower", 3), 124, 450, 0.24, -90],
-    [motif("horn", 0), 220, 220, 0.22, -42],
-  ];
-  let svg = "";
-
-  svg += `<circle cx="450" cy="450" r="326" fill="${colors.dark}" opacity="0.08" />`;
-  svg += buildRadialBloomBed(450, 450, 158, 344, colors, config.texture, 16, 0.36);
-  svg += `<circle cx="450" cy="450" r="238" fill="${colors.light}" opacity="0.045" />`;
-  svg += threadPath("M210 450 C260 360 340 292 450 276 C560 292 640 360 690 450 C640 540 560 608 450 624 C340 608 260 540 210 450Z", colors.secondary, 5.2, config.texture, `opacity="0.68"`);
-  svg += threadPath("M450 196 C520 252 588 314 704 450 C588 586 520 648 450 704 C380 648 312 586 196 450 C312 314 380 252 450 196Z", colors.accent, 3.6, "continuous", `opacity="0.58"`);
-
-  outerBlooms.forEach(([id, x, y, scale, rotation], index) => {
-    svg += placeMotif(id, x, y, scale, rotation, colors, config.texture, rng, index + 60);
-  });
-
-  anchorMotifs.forEach(([id, x, y, scale, rotation], index) => {
-    svg += placeMotif(id, x, y, scale, rotation, colors, config.texture, rng, index + 10);
-  });
-
-  svg += placeMotif(SPECIAL_MAPLE_MOTIF, 450, 450, 1.28, 0, colors, config.texture, rng, 0);
-  if (config.border) svg += buildFestivalBorder(colors, config.texture, selected, rng);
+  if (config.border) {
+    svg += hasMapleCenter
+      ? buildFestivalBorder(colors, config.texture, supportingMotifs, rng, config.density, config.complexity)
+      : buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(7 + config.density * 6));
+  }
   return svg;
 }
 
