@@ -258,21 +258,15 @@ input:focus-visible {
   background: var(--primary-hover);
 }
 
-.button-primary.is-generating,
 .button-primary:disabled {
   cursor: wait;
-  opacity: 0.94;
-  transform: none;
-}
-
-.button-primary.is-generating:hover {
-  background: var(--carmine);
+  opacity: 0.86;
 }
 
 .loading-ring {
-  width: 15px;
-  height: 15px;
-  border: 2px solid rgba(255, 247, 232, 0.42);
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 247, 232, 0.32);
   border-top-color: var(--on-accent);
   border-radius: 50%;
   animation: loadingSpin 760ms linear infinite;
@@ -677,6 +671,37 @@ input:focus-visible {
     stitchKick 820ms ease-out both;
 }
 
+.pattern-frame .generation-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  color: var(--on-accent);
+  background: var(--frame-bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.pattern-frame .generation-overlay-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: var(--radius);
+  background: var(--carmine);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.pattern-frame.is-generating .generation-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .pattern-output {
   width: min(100%, 100cqh, 780px);
   max-height: 100%;
@@ -857,8 +882,7 @@ input:focus-visible {
     transform: rotate(360deg);
   }
 }
-
- pageRise {
+@keyframes pageRise {
   from {
     opacity: 0.88;
   }

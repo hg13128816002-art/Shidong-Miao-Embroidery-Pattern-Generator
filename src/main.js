@@ -630,7 +630,7 @@ function renderCulture() {
 }
 
 function randomize() {
-  if (elements.randomizeButton.classList.contains("is-generating")) return;
+  if (elements.patternFrame.classList.contains("is-generating")) return;
 
   setGeneratingState(true);
   window.clearTimeout(generationTimer);
@@ -658,12 +658,9 @@ function randomize() {
 }
 
 function setGeneratingState(isGenerating) {
-  elements.randomizeButton.classList.toggle("is-generating", isGenerating);
+  elements.patternFrame.classList.toggle("is-generating", isGenerating);
+  elements.patternFrame.setAttribute("aria-busy", isGenerating ? "true" : "false");
   elements.randomizeButton.disabled = isGenerating;
-  elements.randomizeButton.setAttribute("aria-busy", isGenerating ? "true" : "false");
-  elements.randomizeButton.innerHTML = isGenerating
-    ? `<span class="loading-ring" aria-hidden="true"></span><span>generating...</span>`
-    : `<span aria-hidden="true">↻</span>生成纹样`;
 }
 
 function buildPatternSvg(config) {
