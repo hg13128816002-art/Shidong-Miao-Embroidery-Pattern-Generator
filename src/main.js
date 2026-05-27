@@ -54,9 +54,9 @@ const layouts = [
 ];
 
 const textures = [
-  { id: "chain", name: "双针锁绣感", detail: "圆点线迹" },
-  { id: "split", name: "破线绣感", detail: "细密短线" },
-  { id: "stack", name: "叠绣感", detail: "厚重层次" },
+  { id: "chain", name: "双针锁绣", detail: "圆点线迹" },
+  { id: "split", name: "破线绣", detail: "细密短线" },
+  { id: "stack", name: "叠绣", detail: "厚重层次" },
   { id: "woven", name: "织锦颗粒", detail: "经纬网格" },
 ];
 
