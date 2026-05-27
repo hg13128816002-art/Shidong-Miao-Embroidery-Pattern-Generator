@@ -49,8 +49,8 @@ const motifs = [
 const layouts = [
   { id: "radial", name: "团花", detail: "中心纹样向四周展开" },
   { id: "repeat", name: "连续", detail: "单元重复形成满幅" },
-  { id: "apron", name: "围腰", detail: "边饰与主体分区" },
-  { id: "river", name: "清水江", detail: "流线串联纹样" },
+  { id: "apron", name: "适合", detail: "边饰与主体分区" },
+  { id: "river", name: "自由", detail: "流线串联纹样" },
 ];
 
 const textures = [
