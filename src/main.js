@@ -25,6 +25,11 @@ const motifs = [
     note: "花纹适合填补满绣空间，也能连接动物、人物和几何边饰，让画面更繁而有序。",
   },
   {
+    id: "maple",
+    name: "枫香树纹",
+    note: "枫香树纹来自清水江流域苗族关于枫木、蝴蝶妈妈与祖源记忆的叙事。本项目以树芯、对称枝叶和枫香果点作抽象化表现。",
+  },
+  {
     id: "water",
     name: "水纹",
     note: "施洞位于清水江流域，水纹在这里可作为地域线索，连接贸易、生活和河流记忆。",
@@ -134,7 +139,7 @@ const presets = [
     name: "节庆满绣",
     detail: "高密度团花",
     apply: {
-      motifs: ["dragon", "butterfly", "fish", "flower", "horn"],
+      motifs: ["dragon", "butterfly", "maple", "fish", "flower", "horn"],
       layout: "radial",
       palette: "festival",
       texture: "stack",
@@ -164,7 +169,7 @@ const presets = [
     name: "母花素稿",
     detail: "线稿式构成",
     apply: {
-      motifs: ["dragon", "horn", "flower", "human"],
+      motifs: ["maple", "dragon", "horn", "flower", "human"],
       layout: "repeat",
       palette: "mother",
       texture: "split",
@@ -801,6 +806,7 @@ function renderMotif(id, colors, texture, rng, variant = 0) {
   if (id === "bird") return birdMotif(colors, texture);
   if (id === "flower") return flowerMotif(colors, texture, variant);
   if (id === "water") return waterMotif(colors, texture);
+  if (id === "maple") return mapleMotif(colors, texture);
   if (id === "horn") return hornMotif(colors, texture);
   if (id === "human") return humanMotif(colors, texture);
   return dragonMotif(colors, texture, rng);
@@ -878,6 +884,26 @@ function flowerMotif(colors, texture, variant) {
       <circle cx="0" cy="0" r="24" fill="${colors.accent}" opacity="0.28" />
       ${threadPath("M-22 0 C-8 -18 8 -18 22 0 C8 18 -8 18 -22 0Z", colors.accent, 5, "split")}
       <circle cx="0" cy="0" r="9" fill="${colors.light}" stroke="${colors.dark}" stroke-width="4" />
+    </g>
+  `;
+}
+
+
+function mapleMotif(colors, texture) {
+  const leafPath = "M0 -76 C-12 -52 -42 -58 -54 -36 C-32 -32 -36 -6 -18 -8 C-12 12 0 20 0 42 C0 20 12 12 18 -8 C36 -6 32 -32 54 -36 C42 -58 12 -52 0 -76Z";
+
+  return `
+    <g filter="url(#threadShadow)">
+      <path d="${leafPath}" fill="${colors.secondary}" opacity="0.18" />
+      ${threadPath(leafPath, colors.secondary, 7, texture)}
+      ${threadPath("M0 70 C-6 36 -4 -8 0 -58 M0 2 C-28 -18 -38 -32 -50 -48 M0 -4 C28 -22 38 -34 50 -50", colors.primary, 9, texture)}
+      ${threadPath("M0 58 C-28 44 -54 58 -76 76 M0 58 C28 44 54 58 76 76", colors.accent, 5, "split", `opacity="0.86"`)}
+      ${threadPath("M-38 -18 C-20 -26 -10 -40 0 -62 M38 -18 C20 -26 10 -40 0 -62 M-16 16 C-8 0 -4 -24 0 -58 M16 16 C8 0 4 -24 0 -58", colors.light, 3.5, "split", `opacity="0.72"`)}
+      <circle cx="-56" cy="-18" r="9" fill="${colors.primary}" opacity="0.26" />
+      <circle cx="56" cy="-18" r="9" fill="${colors.primary}" opacity="0.26" />
+      <circle cx="-56" cy="-18" r="4" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="2" />
+      <circle cx="56" cy="-18" r="4" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="2" />
+      <circle cx="0" cy="-58" r="5" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3" />
     </g>
   `;
 }
