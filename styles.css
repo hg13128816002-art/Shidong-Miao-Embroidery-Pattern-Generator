@@ -589,8 +589,12 @@ input:focus-visible {
 .theme-button {
   flex: 0 0 40px;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.theme-button span {
+  line-height: 1;
 }
 
 .theme-button:hover {

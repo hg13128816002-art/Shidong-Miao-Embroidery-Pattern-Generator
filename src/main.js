@@ -318,7 +318,7 @@ function updateThemeButton() {
   const resolvedTheme = getResolvedTheme();
   const nextThemeLabel = resolvedTheme === "dark" ? "浅色" : "深色";
   elements.themeButton.dataset.theme = resolvedTheme;
-  elements.themeButton.querySelector("span").textContent = resolvedTheme === "dark" ? "暗" : "亮";
+  elements.themeButton.querySelector("span").innerHTML = resolvedTheme === "dark" ? "&#9789;" : "&#9728;";
   elements.themeButton.setAttribute("aria-label", "切换为" + nextThemeLabel + "主题");
   elements.themeButton.title = "切换为" + nextThemeLabel + "主题";
 }
