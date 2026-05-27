@@ -258,6 +258,26 @@ input:focus-visible {
   background: var(--primary-hover);
 }
 
+.button-primary.is-generating,
+.button-primary:disabled {
+  cursor: wait;
+  opacity: 0.94;
+  transform: none;
+}
+
+.button-primary.is-generating:hover {
+  background: var(--carmine);
+}
+
+.loading-ring {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 247, 232, 0.42);
+  border-top-color: var(--on-accent);
+  border-radius: 50%;
+  animation: loadingSpin 760ms linear infinite;
+}
+
 .studio {
   width: min(1540px, calc(100% - 32px));
   margin: 10px auto 20px;
@@ -832,7 +852,13 @@ input:focus-visible {
   transform: translate(-50%, 0);
 }
 
-@keyframes pageRise {
+@keyframes loadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+ pageRise {
   from {
     opacity: 0.88;
   }

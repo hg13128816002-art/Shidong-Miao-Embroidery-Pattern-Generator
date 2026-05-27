@@ -215,6 +215,7 @@ let state = readStateFromUrl();
 let toastTimer = null;
 let activeControlTab = "preset";
 let patternAnimationTimer = null;
+let generationTimer = null;
 const THEME_STORAGE_KEY = "miao-theme";
 const systemThemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
@@ -629,23 +630,40 @@ function renderCulture() {
 }
 
 function randomize() {
-  const rng = mulberry32(Date.now());
-  const motifCount = randomInt(rng, 3, 6);
-  const shuffled = motifs.filter((motif) => motif.id !== SPECIAL_MAPLE_MOTIF).sort(() => rng() - 0.5);
-  state = {
-    ...state,
-    motifs: shuffled.slice(0, motifCount).map((motif) => motif.id),
-    layout: pick(rng, layouts).id,
-    palette: pick(rng, palettes).id,
-    texture: pick(rng, textures).id,
-    density: clamp(0.35 + rng() * 0.56, 0.15, 1),
-    complexity: clamp(0.32 + rng() * 0.58, 0.1, 1),
-    symmetry: rng() > 0.28,
-    border: rng() > 0.18,
-    seed: makeSeed(),
-  };
-  renderApp();
-  showToast("新的纹样已经生成");
+  if (elements.randomizeButton.classList.contains("is-generating")) return;
+
+  setGeneratingState(true);
+  window.clearTimeout(generationTimer);
+
+  generationTimer = window.setTimeout(() => {
+    const rng = mulberry32(Date.now());
+    const motifCount = randomInt(rng, 3, 6);
+    const shuffled = motifs.filter((motif) => motif.id !== SPECIAL_MAPLE_MOTIF).sort(() => rng() - 0.5);
+    state = {
+      ...state,
+      motifs: shuffled.slice(0, motifCount).map((motif) => motif.id),
+      layout: pick(rng, layouts).id,
+      palette: pick(rng, palettes).id,
+      texture: pick(rng, textures).id,
+      density: clamp(0.35 + rng() * 0.56, 0.15, 1),
+      complexity: clamp(0.32 + rng() * 0.58, 0.1, 1),
+      symmetry: rng() > 0.28,
+      border: rng() > 0.18,
+      seed: makeSeed(),
+    };
+    renderApp();
+    setGeneratingState(false);
+    showToast("新的纹样已经生成");
+  }, 680);
+}
+
+function setGeneratingState(isGenerating) {
+  elements.randomizeButton.classList.toggle("is-generating", isGenerating);
+  elements.randomizeButton.disabled = isGenerating;
+  elements.randomizeButton.setAttribute("aria-busy", isGenerating ? "true" : "false");
+  elements.randomizeButton.innerHTML = isGenerating
+    ? `<span class="loading-ring" aria-hidden="true"></span><span>generating...</span>`
+    : `<span aria-hidden="true">↻</span>生成纹样`;
 }
 
 function buildPatternSvg(config) {
