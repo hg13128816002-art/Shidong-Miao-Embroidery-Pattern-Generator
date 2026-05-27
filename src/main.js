@@ -890,20 +890,46 @@ function flowerMotif(colors, texture, variant) {
 
 
 function mapleMotif(colors, texture) {
-  const leafPath = "M0 -76 C-12 -52 -42 -58 -54 -36 C-32 -32 -36 -6 -18 -8 C-12 12 0 20 0 42 C0 20 12 12 18 -8 C36 -6 32 -32 54 -36 C42 -58 12 -52 0 -76Z";
+  const leafPath = "M0 -48 C-18 -28 -18 10 0 30 C18 10 18 -28 0 -48Z";
+  const leaf = (angle, color, scale = 1) => `
+    <g transform="rotate(${angle}) translate(0 -38) scale(${scale})">
+      <path d="${leafPath}" fill="${color}" opacity="0.24" />
+      ${threadPath(leafPath, color, 5.5, texture)}
+      ${threadPath("M0 -36 C-5 -14 -5 8 0 24 M-10 -12 C-3 -7 3 -7 10 -12", colors.light, 2.8, "split", `opacity="0.72"`)}
+    </g>
+  `;
+  const cornerKnot = (x, y, sx, sy) => `
+    <g transform="translate(${x} ${y}) scale(${sx} ${sy})">
+      ${threadPath("M-20 -18H18V16H-8V-4H8", colors.light, 5, "split")}
+      ${threadPath("M-20 18H-2 M18 -18V0", colors.light, 4, "split", `opacity="0.82"`)}
+    </g>
+  `;
 
   return `
     <g filter="url(#threadShadow)">
-      <path d="${leafPath}" fill="${colors.secondary}" opacity="0.18" />
-      ${threadPath(leafPath, colors.secondary, 7, texture)}
-      ${threadPath("M0 70 C-6 36 -4 -8 0 -58 M0 2 C-28 -18 -38 -32 -50 -48 M0 -4 C28 -22 38 -34 50 -50", colors.primary, 9, texture)}
-      ${threadPath("M0 58 C-28 44 -54 58 -76 76 M0 58 C28 44 54 58 76 76", colors.accent, 5, "split", `opacity="0.86"`)}
-      ${threadPath("M-38 -18 C-20 -26 -10 -40 0 -62 M38 -18 C20 -26 10 -40 0 -62 M-16 16 C-8 0 -4 -24 0 -58 M16 16 C8 0 4 -24 0 -58", colors.light, 3.5, "split", `opacity="0.72"`)}
-      <circle cx="-56" cy="-18" r="9" fill="${colors.primary}" opacity="0.26" />
-      <circle cx="56" cy="-18" r="9" fill="${colors.primary}" opacity="0.26" />
-      <circle cx="-56" cy="-18" r="4" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="2" />
-      <circle cx="56" cy="-18" r="4" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="2" />
-      <circle cx="0" cy="-58" r="5" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3" />
+      <rect x="-106" y="-84" width="212" height="168" fill="${colors.dark}" opacity="0.16" />
+      ${threadPath("M-106 -84H106V84H-106Z", colors.accent, 6, texture)}
+      ${threadPath("M-94 -72H94V72H-94Z", colors.primary, 5, "split", `opacity="0.92"`)}
+      ${threadPath("M-80 -60H80V60H-80Z", colors.secondary, 4, texture)}
+
+      ${threadPath("M0 -58V58 M-70 0H70 M-52 -44L52 44 M52 -44L-52 44", colors.accent, 5, texture, `opacity="0.9"`)}
+      ${leaf(0, colors.secondary, 0.84)}
+      ${leaf(45, colors.primary, 0.74)}
+      ${leaf(90, colors.secondary, 0.84)}
+      ${leaf(135, colors.primary, 0.74)}
+      ${leaf(180, colors.secondary, 0.84)}
+      ${leaf(225, colors.primary, 0.74)}
+      ${leaf(270, colors.secondary, 0.84)}
+      ${leaf(315, colors.primary, 0.74)}
+
+      ${cornerKnot(-58, -38, 1, 1)}
+      ${cornerKnot(58, -38, -1, 1)}
+      ${cornerKnot(-58, 38, 1, -1)}
+      ${cornerKnot(58, 38, -1, -1)}
+
+      <circle cx="0" cy="0" r="15" fill="${colors.accent}" opacity="0.3" />
+      <circle cx="0" cy="0" r="8" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="3" />
+      <circle cx="0" cy="0" r="3" fill="${colors.light}" />
     </g>
   `;
 }
