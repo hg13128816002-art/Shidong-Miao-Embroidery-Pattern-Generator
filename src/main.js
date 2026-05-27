@@ -861,166 +861,87 @@ function motifDot(x, y, r, color, opacity = 0.9) {
   return `<circle cx="${round(x)}" cy="${round(y)}" r="${round(r)}" fill="${color}" opacity="${opacity}" />`;
 }
 
-function motifDots(points, color, radius = 3, opacity = 0.88) {
-  return points.map(([x, y, r = radius, fill = color]) => motifDot(x, y, r, fill, opacity)).join("");
-}
-
-function motifDiamond(x, y, size, color, opacity = 0.86) {
+function motifDiamond(x, y, size, color, opacity = 0.84) {
   return `<path d="M${round(x)} ${round(y - size)} L${round(x + size)} ${round(y)} L${round(x)} ${round(y + size)} L${round(x - size)} ${round(y)}Z" fill="${color}" opacity="${opacity}" />`;
 }
 
-function motifDiamonds(points, color, size = 5, opacity = 0.84) {
-  return points.map(([x, y, s = size, fill = color]) => motifDiamond(x, y, s, fill, opacity)).join("");
-}
-
-function motifNeedles(segments, color, width = 2.6, opacity = 0.78) {
-  return segments
-    .map(([x1, y1, x2, y2]) => threadPath(`M${x1} ${y1}L${x2} ${y2}`, color, width, "split", `opacity="${opacity}"`))
-    .join("");
+function continuousPath(d, color, width, extra = "") {
+  return threadPath(d, color, width, "continuous", extra);
 }
 
 function dragonMotif(colors, texture) {
-  const scaleDots = [
-    [-62, -16, 4.2],
-    [-42, -32, 3.6],
-    [-18, -36, 3.8],
-    [8, -28, 3.4],
-    [31, -10, 3.8],
-    [30, 18, 3.6],
-    [7, 38, 3.4],
-    [-22, 38, 3.6],
-    [-48, 24, 3.3],
-  ];
-  const mane = [
-    [-68, -34, -60, -60, -48, -38],
-    [-42, -50, -30, -76, -20, -48],
-    [-10, -52, 3, -78, 12, -44],
-    [18, -38, 40, -58, 38, -24],
-  ];
-
+  const body = "M-100 10 C-82 -54 -14 -76 35 -40 C83 -5 63 58 2 63 C-47 67 -86 34 -73 3 C-62 -24 -10 -23 11 2 C34 28 5 55 -35 36";
+  const inner = "M-81 14 C-56 -33 4 -49 39 -20 C65 1 54 39 10 46 C-24 51 -57 35 -54 12 C-49 -9 -15 -10 1 7 C14 21 0 35 -24 31";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M-98 14 C-78 -62 -8 -82 38 -42 C84 -2 63 62 1 66 C-48 69 -88 34 -76 2 C-64 -26 -9 -23 11 5 C33 36 -12 58 -43 34 C-23 43 3 35 -1 14 C-5 -5 -43 -7 -53 12 C-64 35 -34 49 -3 48 C35 47 60 14 43 -17 C17 -56 -59 -42 -82 18Z" fill="${colors.primary}" opacity="0.17" />
-      ${threadPath("M-98 14 C-78 -62 -8 -82 38 -42 C84 -2 63 62 1 66 C-48 69 -88 34 -76 2 C-64 -26 -9 -23 11 5 C33 36 -12 58 -43 34", colors.primary, 14, texture)}
-      ${threadPath("M-82 18 C-58 -34 11 -50 43 -17 C60 14 35 47 -3 48 C-34 49 -64 35 -53 12 C-43 -7 -5 -5 -1 14", colors.secondary, 5.5, "split", `opacity="0.84"`)}
-      ${threadPath("M-66 24 C-40 8 -9 8 16 25 M-44 42 C-21 28 8 27 30 39", colors.accent, 4.2, "split", `opacity="0.74"`)}
-      ${mane.map(([x1, y1, x2, y2, x3, y3]) => `<path d="M${x1} ${y1} L${x2} ${y2} L${x3} ${y3}Z" fill="${colors.accent}" opacity="0.86" />`).join("")}
-      ${threadPath("M35 -42 C60 -72 95 -62 91 -25 C109 -15 109 6 91 16 C70 28 52 13 47 -7", colors.primary, 10, texture)}
-      ${threadPath("M52 -55 C64 -84 84 -84 91 -64 M42 -50 C43 -78 19 -88 13 -59", colors.accent, 6, texture)}
-      ${threadPath("M75 -4 C108 -14 120 -34 112 -53 M77 10 C105 31 124 14 132 -2", colors.secondary, 4, "split", `opacity="0.88"`)}
-      ${threadPath("M87 4 L116 14 L88 24 M90 -16 L112 -22", colors.dark, 5.5, texture)}
-      ${motifDots(scaleDots, colors.light, 3.4, 0.9)}
-      ${motifDiamonds([[-49, -8, 4, colors.secondary], [-22, -16, 4, colors.accent], [8, -10, 4, colors.secondary], [13, 20, 4, colors.accent], [-20, 24, 4, colors.secondary]], colors.secondary, 4, 0.86)}
-      ${threadPath("M-43 52 L-61 76 L-27 60 M-78 2 L-104 -18 L-94 14", colors.accent, 4.6, texture)}
-      <circle cx="65" cy="-22" r="6.5" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3.2" />
-      <circle cx="66" cy="-22" r="2" fill="${colors.primary}" />
+      <path d="${body} C-18 47 -4 42 3 29 C-8 38 -31 40 -48 29 C-70 15 -55 -10 -26 -8 C4 -6 25 11 22 29 C44 19 48 -8 31 -25 C0 -55 -67 -38 -90 17Z" fill="${colors.primary}" opacity="0.16" />
+      ${threadPath(body, colors.primary, 13, texture)}
+      ${continuousPath(inner, colors.secondary, 4.8, `opacity="0.86"`)}
+      ${continuousPath("M-66 23 C-39 9 -7 8 17 23 C4 14 -13 13 -28 20", colors.accent, 4, `opacity="0.78"`)}
+      ${continuousPath("M31 -39 C55 -69 92 -60 90 -25 C107 -16 105 8 87 18 C66 29 50 13 46 -8", colors.primary, 8.5)}
+      ${continuousPath("M51 -52 C61 -75 82 -77 91 -58 M43 -49 C42 -74 21 -80 13 -57", colors.accent, 5.2)}
+      ${continuousPath("M84 -3 L116 10 L86 24 M86 -18 C97 -22 107 -27 114 -38", colors.dark, 4.4, `opacity="0.82"`)}
+      ${continuousPath("M-38 -44 C-30 -59 -19 -67 -6 -70 C-3 -58 2 -48 12 -39 M-62 -14 C-81 -21 -95 -27 -106 -40 C-101 -24 -94 -10 -82 1 M-42 43 C-54 56 -64 65 -78 72 C-61 72 -46 66 -31 55", colors.accent, 4.2, `opacity="0.86"`)}
+      ${motifDiamond(-20, -14, 4, colors.light, 0.78)}
+      ${motifDiamond(14, 14, 4, colors.light, 0.78)}
+      ${motifDot(64, -22, 2.7, colors.light, 0.95)}
     </g>
   `;
 }
 
 function fishMotif(colors, texture) {
-  const scaleDots = [
-    [-38, -18, 3],
-    [-18, -20, 3],
-    [4, -18, 3],
-    [24, -12, 3],
-    [-44, 4, 3],
-    [-22, 6, 3],
-    [0, 6, 3],
-    [22, 4, 3],
-    [-35, 24, 3],
-    [-12, 25, 3],
-    [12, 22, 3],
-  ];
-  const finNeedles = [
-    [-6, -33, 10, -58],
-    [4, -31, 24, -54],
-    [-8, 33, 12, 56],
-    [4, 31, 28, 50],
-  ];
-
+  const body = "M-86 0 C-50 -47 33 -47 78 0 C35 47 -50 48 -86 0Z";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M-84 0 C-48 -50 32 -48 76 0 C34 48 -47 52 -84 0Z" fill="${colors.primary}" opacity="0.18" />
-      ${threadPath("M-84 0 C-48 -50 32 -48 76 0 C34 48 -47 52 -84 0Z", colors.primary, 9, texture)}
-      <path d="M75 0 L114 -40 L105 -8 L122 0 L105 8 L114 40Z" fill="${colors.secondary}" opacity="0.18" />
-      ${threadPath("M75 0 L114 -40 L105 -8 L122 0 L105 8 L114 40Z", colors.secondary, 7, texture)}
-      ${threadPath("M-44 -34 C-28 -12 -28 12 -44 34 M-18 -40 C0 -14 0 14 -18 40 M10 -37 C29 -10 29 10 10 37 M40 -25 C50 -7 50 7 40 25", colors.accent, 3.8, "split", `opacity="0.9"`)}
-      ${threadPath("M-62 0 C-38 -15 -6 -16 24 0 C-6 16 -38 15 -62 0", colors.secondary, 4, "split", `opacity="0.72"`)}
-      ${motifNeedles(finNeedles, colors.secondary, 3.2, 0.78)}
-      ${motifDots(scaleDots, colors.light, 2.7, 0.86)}
-      ${motifDiamonds([[54, 0, 4, colors.accent], [93, -16, 4, colors.light], [94, 16, 4, colors.light]], colors.accent, 4, 0.84)}
-      ${threadPath("M-89 -2 L-108 -14 M-89 3 L-108 16", colors.accent, 3.2, "split", `opacity="0.82"`)}
-      <circle cx="-52" cy="-9" r="7" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3" />
-      <circle cx="-53" cy="-10" r="2" fill="${colors.primary}" />
+      <path d="${body}" fill="${colors.primary}" opacity="0.17" />
+      ${threadPath(body, colors.primary, 8.5, texture)}
+      <path d="M76 0 L116 -37 C105 -16 105 16 116 37Z" fill="${colors.secondary}" opacity="0.16" />
+      ${threadPath("M76 0 L116 -37 C105 -16 105 16 116 37Z", colors.secondary, 6.6, texture)}
+      ${continuousPath("M-54 0 C-24 -16 17 -16 52 0 C17 16 -24 16 -54 0", colors.secondary, 4.4, `opacity="0.78"`)}
+      ${continuousPath("M-38 -31 C-25 -11 -25 11 -38 31 M-7 -36 C9 -13 9 13 -7 36 M26 -27 C37 -9 37 9 26 27", colors.accent, 3.4, `opacity="0.78"`)}
+      ${continuousPath("M-2 -35 C12 -49 30 -52 48 -44 M-2 35 C13 48 32 50 51 40", colors.secondary, 3.6, `opacity="0.82"`)}
+      ${motifDiamond(56, 0, 4.2, colors.accent, 0.82)}
+      ${motifDot(-52, -8, 2.8, colors.light, 0.94)}
     </g>
   `;
 }
 
 function butterflyMotif(colors, texture) {
-  const wingDots = [
-    [-72, -40, 4.2, colors.light],
-    [-47, -22, 3.6, colors.accent],
-    [-75, 28, 3.8, colors.light],
-    [-34, 44, 3.4, colors.secondary],
-    [72, -40, 4.2, colors.light],
-    [47, -22, 3.6, colors.accent],
-    [75, 28, 3.8, colors.light],
-    [34, 44, 3.4, colors.primary],
-  ];
-
+  const leftWing = "M-8 -18 C-45 -80 -108 -72 -110 -16 C-112 16 -84 26 -55 14 C-91 58 -49 89 -8 32Z";
+  const rightWing = "M8 -18 C45 -80 108 -72 110 -16 C112 16 84 26 55 14 C91 58 49 89 8 32Z";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M-8 -20 C-48 -84 -112 -78 -112 -18 C-111 17 -82 25 -54 15 C-91 61 -48 94 -8 32Z" fill="${colors.primary}" opacity="0.2" />
-      <path d="M8 -20 C48 -84 112 -78 112 -18 C111 17 82 25 54 15 C91 61 48 94 8 32Z" fill="${colors.secondary}" opacity="0.2" />
-      ${threadPath("M-8 -20 C-48 -84 -112 -78 -112 -18 C-111 17 -82 25 -54 15 C-91 61 -48 94 -8 32Z", colors.primary, 8, texture)}
-      ${threadPath("M8 -20 C48 -84 112 -78 112 -18 C111 17 82 25 54 15 C91 61 48 94 8 32Z", colors.secondary, 8, texture)}
-      ${threadPath("M0 -55 C-12 -24 -12 34 0 76 M0 -55 C12 -24 12 34 0 76", colors.dark, 6.5, "split")}
-      ${threadPath("M-8 -50 C-29 -84 -56 -89 -75 -66 M8 -50 C29 -84 56 -89 75 -66", colors.accent, 4, texture)}
-      ${threadPath("M-89 -17 C-62 -20 -35 -9 -14 18 M89 -17 C62 -20 35 -9 14 18", colors.light, 3.6, "split", `opacity="0.88"`)}
-      ${threadPath("M-66 49 C-45 37 -28 38 -11 55 M66 49 C45 37 28 38 11 55", colors.accent, 3.6, "split", `opacity="0.82"`)}
-      ${threadPath("M-42 -55 C-37 -31 -29 -12 -14 8 M42 -55 C37 -31 29 -12 14 8", colors.secondary, 4.2, "split", `opacity="0.78"`)}
-      ${threadPath("M-48 16 C-36 23 -25 35 -17 53 M48 16 C36 23 25 35 17 53", colors.primary, 4.2, "split", `opacity="0.78"`)}
-      ${motifDots(wingDots, colors.light, 3.8, 0.9)}
-      ${motifDiamonds([[-58, -2, 5, colors.secondary], [-49, 61, 4, colors.light], [58, -2, 5, colors.primary], [49, 61, 4, colors.light], [0, 2, 4, colors.accent]], colors.accent, 4, 0.86)}
-      <ellipse cx="0" cy="7" rx="8" ry="44" fill="${colors.dark}" opacity="0.28" />
-      <circle cx="0" cy="-40" r="7" fill="${colors.accent}" opacity="0.9" />
-      <circle cx="0" cy="22" r="5" fill="${colors.light}" opacity="0.86" />
+      <path d="${leftWing}" fill="${colors.primary}" opacity="0.18" />
+      <path d="${rightWing}" fill="${colors.secondary}" opacity="0.18" />
+      ${threadPath(leftWing, colors.primary, 7.8, texture)}
+      ${threadPath(rightWing, colors.secondary, 7.8, texture)}
+      ${continuousPath("M0 -53 C-11 -22 -11 34 0 76 M0 -53 C11 -22 11 34 0 76", colors.dark, 5.4, `opacity="0.74"`)}
+      ${continuousPath("M-8 -50 C-31 -80 -56 -85 -76 -62 M8 -50 C31 -80 56 -85 76 -62", colors.accent, 3.8)}
+      ${continuousPath("M-89 -16 C-61 -22 -34 -10 -14 18 M89 -16 C61 -22 34 -10 14 18", colors.light, 3.2, `opacity="0.76"`)}
+      ${continuousPath("M-68 47 C-45 34 -28 37 -12 56 M68 47 C45 34 28 37 12 56", colors.accent, 3.2, `opacity="0.76"`)}
+      ${continuousPath("M-42 -55 C-34 -28 -24 -9 -9 8 M42 -55 C34 -28 24 -9 9 8", colors.secondary, 3.6, `opacity="0.7"`)}
+      ${motifDiamond(-58, -2, 4.6, colors.light, 0.76)}
+      ${motifDiamond(58, -2, 4.6, colors.light, 0.76)}
+      ${motifDot(0, -38, 3.4, colors.accent, 0.9)}
+      ${motifDot(0, 22, 3.2, colors.light, 0.82)}
     </g>
   `;
 }
 
 function birdMotif(colors, texture) {
-  const tailNeedles = [
-    [-60, 30, -110, 66],
-    [-44, 36, -78, 82],
-    [-25, 39, -42, 88],
-    [-8, 40, -8, 82],
-  ];
-  const wingDots = [
-    [-30, -8, 3.4],
-    [-8, -14, 3],
-    [16, -10, 3.2],
-    [34, 2, 2.8],
-    [-36, 18, 3],
-    [-13, 20, 3.2],
-    [12, 18, 3],
-  ];
-
+  const body = "M-92 22 C-45 -66 42 -63 82 7 C39 0 7 18 -11 58 C-29 36 -55 25 -92 22Z";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M-91 24 C-42 -70 42 -64 82 7 C39 0 7 18 -11 58 C-29 35 -55 24 -91 24Z" fill="${colors.secondary}" opacity="0.18" />
-      ${threadPath("M-91 24 C-42 -70 42 -64 82 7 C39 0 7 18 -11 58 C-29 35 -55 24 -91 24Z", colors.secondary, 8, texture)}
-      ${threadPath("M-51 17 C-23 -17 28 -23 69 6", colors.primary, 8, texture)}
-      ${threadPath("M-46 6 C-16 6 17 15 44 36 M-36 -11 C-8 -5 17 3 41 20", colors.light, 3.2, "split", `opacity="0.72"`)}
-      ${motifNeedles(tailNeedles, colors.primary, 4.2, 0.86)}
-      ${threadPath("M72 5 L111 -8 L78 25", colors.accent, 6, texture)}
-      ${threadPath("M48 -9 C42 -38 61 -51 80 -42 M41 -11 C31 -42 46 -59 64 -55", colors.accent, 4, "split", `opacity="0.86"`)}
-      ${threadPath("M-70 25 C-48 42 -25 48 -4 44", colors.accent, 4, "split", `opacity="0.8"`)}
-      ${motifDots(wingDots, colors.light, 3, 0.88)}
-      ${motifDiamonds([[-55, 33, 4, colors.accent], [-75, 51, 3.5, colors.light], [-27, 54, 3.5, colors.secondary]], colors.accent, 4, 0.84)}
-      <circle cx="49" cy="-1" r="5.8" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3" />
-      <circle cx="50" cy="-2" r="1.7" fill="${colors.primary}" />
+      <path d="${body}" fill="${colors.secondary}" opacity="0.17" />
+      ${threadPath(body, colors.secondary, 7.8, texture)}
+      ${continuousPath("M-52 16 C-24 -18 28 -23 70 6", colors.primary, 7.2)}
+      ${continuousPath("M-48 4 C-17 6 16 16 45 36 M-36 -12 C-7 -7 18 3 43 20", colors.light, 3.1, `opacity="0.68"`)}
+      ${continuousPath("M-62 29 C-83 43 -99 56 -112 72 M-46 36 C-61 55 -72 70 -83 87 M-27 39 C-34 57 -39 73 -43 88", colors.primary, 4.3)}
+      ${continuousPath("M72 5 L111 -8 L78 25", colors.accent, 5.4)}
+      ${continuousPath("M48 -9 C43 -35 61 -50 80 -41 M42 -11 C34 -37 48 -55 65 -53", colors.accent, 3.6, `opacity="0.84"`)}
+      ${continuousPath("M-70 25 C-48 42 -25 48 -4 44", colors.accent, 3.7, `opacity="0.78"`)}
+      ${motifDiamond(-55, 33, 4.2, colors.light, 0.74)}
+      ${motifDot(50, -2, 2.5, colors.light, 0.94)}
     </g>
   `;
 }
@@ -1029,87 +950,64 @@ function flowerMotif(colors, texture, variant) {
   const petals = 8 + ((variant || 0) % 2) * 2;
   let outerPetals = "";
   let innerPetals = "";
-  let rimDots = "";
 
   for (let i = 0; i < petals; i += 1) {
     const angle = (360 / petals) * i;
     const color = i % 2 ? colors.secondary : colors.primary;
     outerPetals += `
       <g transform="rotate(${angle})">
-        <path d="M0 -15 C-28 -42 -21 -78 0 -103 C21 -78 28 -42 0 -15Z" fill="${color}" opacity="0.2" />
-        ${threadPath("M0 -15 C-28 -42 -21 -78 0 -103 C21 -78 28 -42 0 -15Z", color, 5.4, texture)}
-        ${threadPath("M0 -28 C-7 -47 -6 -66 0 -86 M-10 -52 C-3 -47 3 -47 10 -52", colors.light, 2.7, "split", `opacity="0.72"`)}
+        <path d="M0 -15 C-27 -43 -20 -78 0 -102 C20 -78 27 -43 0 -15Z" fill="${color}" opacity="0.18" />
+        ${threadPath("M0 -15 C-27 -43 -20 -78 0 -102 C20 -78 27 -43 0 -15Z", color, 5.2, texture)}
+        ${continuousPath("M0 -28 C-5 -46 -5 -67 0 -86", colors.light, 2.4, `opacity="0.62"`)}
       </g>
     `;
     innerPetals += `
       <g transform="rotate(${angle + 360 / petals / 2})">
-        ${threadPath("M0 -20 C-13 -35 -10 -52 0 -62 C10 -52 13 -35 0 -20Z", i % 2 ? colors.primary : colors.secondary, 3.8, "split", `opacity="0.86"`)}
+        ${continuousPath("M0 -22 C-12 -36 -10 -52 0 -63 C10 -52 12 -36 0 -22Z", i % 2 ? colors.primary : colors.secondary, 3.2, `opacity="0.82"`)}
       </g>
     `;
-    const rad = (angle * Math.PI) / 180;
-    rimDots += motifDot(Math.cos(rad) * 79, Math.sin(rad) * 79, 3.2, colors.light, 0.84);
   }
 
   return `
     <g filter="url(#threadShadow)">
       ${outerPetals}
       ${innerPetals}
-      <circle cx="0" cy="0" r="28" fill="${colors.accent}" opacity="0.22" />
-      ${threadPath("M-28 0 C-11 -24 11 -24 28 0 C11 24 -11 24 -28 0Z", colors.accent, 5, "split")}
-      ${threadPath("M0 -32 V32 M-32 0H32 M-23 -23 L23 23 M23 -23 L-23 23", colors.dark, 2.6, "split", `opacity="0.48"`)}
-      ${rimDots}
-      ${motifDiamonds([[0, -44, 4, colors.light], [44, 0, 4, colors.light], [0, 44, 4, colors.light], [-44, 0, 4, colors.light]], colors.light, 4, 0.86)}
-      <circle cx="0" cy="0" r="11" fill="${colors.light}" stroke="${colors.dark}" stroke-width="3.5" />
-      <circle cx="0" cy="0" r="4" fill="${colors.primary}" opacity="0.88" />
+      <circle cx="0" cy="0" r="27" fill="${colors.accent}" opacity="0.2" />
+      ${continuousPath("M-28 0 C-11 -24 11 -24 28 0 C11 24 -11 24 -28 0Z", colors.accent, 4.6)}
+      ${continuousPath("M0 -32 V32 M-32 0H32 M-23 -23 L23 23 M23 -23 L-23 23", colors.dark, 2.2, `opacity="0.42"`)}
+      ${motifDiamond(0, -44, 3.8, colors.light, 0.76)}
+      ${motifDiamond(44, 0, 3.8, colors.light, 0.76)}
+      ${motifDiamond(0, 44, 3.8, colors.light, 0.76)}
+      ${motifDiamond(-44, 0, 3.8, colors.light, 0.76)}
+      <circle cx="0" cy="0" r="10" fill="${colors.light}" opacity="0.86" />
+      <circle cx="0" cy="0" r="4" fill="${colors.primary}" opacity="0.86" />
     </g>
   `;
 }
 
 function mapleMotif(colors, texture) {
-  const leafPath = "M0 -55 L15 -28 L10 -7 L28 9 L8 16 L0 40 L-8 16 L-28 9 L-10 -7 L-15 -28Z";
+  const leafPath = "M0 -55 L14 -27 L9 -6 L27 9 L8 16 L0 40 L-8 16 L-27 9 L-9 -6 L-14 -27Z";
   const leaf = (angle, color, scale = 1) => `
     <g transform="rotate(${angle}) translate(0 -36) scale(${scale})">
-      <path d="${leafPath}" fill="${color}" opacity="0.2" />
-      ${threadPath(leafPath, color, 5.2, texture)}
-      ${threadPath("M0 -42 V28 M-11 -21 L0 -12 L11 -21 M-15 4 L0 12 L15 4", colors.light, 2.4, "split", `opacity="0.72"`)}
+      <path d="${leafPath}" fill="${color}" opacity="0.18" />
+      ${threadPath(leafPath, color, 5, texture)}
+      ${continuousPath("M0 -42 V28 M-12 -20 L0 -11 L12 -20 M-14 4 L0 12 L14 4", colors.light, 2.2, `opacity="0.62"`)}
     </g>
   `;
   const cornerKnot = (x, y, sx, sy) => `
     <g transform="translate(${x} ${y}) scale(${sx} ${sy})">
-      ${threadPath("M-23 -20H19V18H-8V-3H9", colors.light, 4.2, "split")}
-      ${threadPath("M-18 4H-4V18 M-4 -20V-7H9", colors.secondary, 3.2, "split", `opacity="0.82"`)}
-      ${motifDiamonds([[-18, -14, 3.2, colors.light], [13, 13, 3.2, colors.accent]], colors.light, 3.2, 0.86)}
+      ${continuousPath("M-23 -20H19V18H-8V-3H9", colors.light, 3.8)}
+      ${continuousPath("M-18 4H-4V18 M-4 -20V-7H9", colors.secondary, 2.8, `opacity="0.72"`)}
     </g>
   `;
-  const borderDots = [
-    [-88, -66],
-    [-58, -66],
-    [-28, -66],
-    [28, -66],
-    [58, -66],
-    [88, -66],
-    [-88, 66],
-    [-58, 66],
-    [-28, 66],
-    [28, 66],
-    [58, 66],
-    [88, 66],
-    [-96, -42],
-    [-96, 0],
-    [-96, 42],
-    [96, -42],
-    [96, 0],
-    [96, 42],
-  ];
 
   return `
     <g filter="url(#threadShadow)">
       <rect x="-112" y="-88" width="224" height="176" fill="${colors.dark}" opacity="0.18" />
-      ${threadPath("M-112 -88H112V88H-112Z", colors.accent, 5.8, texture)}
-      ${threadPath("M-100 -76H100V76H-100Z", colors.primary, 5, "split", `opacity="0.94"`)}
-      ${threadPath("M-86 -62H86V62H-86Z", colors.secondary, 4.2, texture)}
-      ${motifDots(borderDots, colors.light, 2.3, 0.76)}
-      ${threadPath("M0 -62V62 M-72 0H72 M-54 -47L54 47 M54 -47L-54 47", colors.accent, 4.5, texture, `opacity="0.92"`)}
+      ${threadPath("M-112 -88H112V88H-112Z", colors.accent, 5.6, texture)}
+      ${continuousPath("M-100 -76H100V76H-100Z", colors.primary, 4.4, `opacity="0.9"`)}
+      ${continuousPath("M-86 -62H86V62H-86Z", colors.secondary, 3.8)}
+      ${continuousPath("M0 -62V62 M-72 0H72 M-54 -47L54 47 M54 -47L-54 47", colors.accent, 4.3, `opacity="0.88"`)}
       ${leaf(0, colors.secondary, 0.72)}
       ${leaf(45, colors.primary, 0.62)}
       ${leaf(90, colors.secondary, 0.72)}
@@ -1122,98 +1020,63 @@ function mapleMotif(colors, texture) {
       ${cornerKnot(60, -40, -1, 1)}
       ${cornerKnot(-60, 40, 1, -1)}
       ${cornerKnot(60, 40, -1, -1)}
-      ${motifDiamonds([[0, -70, 4, colors.light], [0, 70, 4, colors.light], [-104, 0, 4, colors.light], [104, 0, 4, colors.light]], colors.light, 4, 0.88)}
-      <circle cx="0" cy="0" r="16" fill="${colors.accent}" opacity="0.32" />
-      <circle cx="0" cy="0" r="9" fill="${colors.secondary}" stroke="${colors.dark}" stroke-width="3" />
-      <circle cx="0" cy="0" r="3.2" fill="${colors.light}" />
+      ${motifDiamond(0, -70, 3.8, colors.light, 0.8)}
+      ${motifDiamond(0, 70, 3.8, colors.light, 0.8)}
+      ${motifDiamond(-104, 0, 3.8, colors.light, 0.8)}
+      ${motifDiamond(104, 0, 3.8, colors.light, 0.8)}
+      <circle cx="0" cy="0" r="15" fill="${colors.accent}" opacity="0.3" />
+      <circle cx="0" cy="0" r="8.5" fill="${colors.secondary}" opacity="0.92" />
+      <circle cx="0" cy="0" r="3" fill="${colors.light}" />
     </g>
   `;
 }
 
 function waterMotif(colors, texture) {
-  const droplets = [
-    [-92, -34, 3.4, colors.light],
-    [-44, -32, 3, colors.accent],
-    [4, -27, 3, colors.light],
-    [52, -31, 3, colors.accent],
-    [104, -32, 3.4, colors.light],
-    [-74, 8, 3, colors.light],
-    [-22, 13, 3, colors.accent],
-    [32, 8, 3, colors.light],
-    [84, 12, 3, colors.accent],
-    [-52, 50, 3, colors.light],
-    [2, 54, 3, colors.accent],
-    [58, 48, 3, colors.light],
-  ];
-
   return `
     <g filter="url(#threadShadow)">
-      ${threadPath("M-118 -34 C-87 -62 -57 -62 -28 -34 S27 -7 57 -34 S105 -61 130 -39", colors.secondary, 8, texture)}
-      ${threadPath("M-121 5 C-87 -27 -47 -27 -12 5 S50 41 92 7", colors.primary, 8, texture)}
-      ${threadPath("M-102 45 C-66 18 -31 18 5 45 S67 72 106 39", colors.accent, 6, "split")}
-      ${threadPath("M-93 -4 H-67 V20 H-42 M-14 -39 H13 V-15 H37 M35 38 H61 V58 H89", colors.light, 3.4, "split", `opacity="0.62"`)}
-      ${threadPath("M-73 -27 C-54 -42 -38 -42 -20 -27 M-37 12 C-16 -5 5 -5 27 12 M21 51 C40 36 58 36 77 51", colors.dark, 2.6, "split", `opacity="0.42"`)}
-      ${motifDots(droplets, colors.light, 2.8, 0.82)}
-      ${motifDiamonds([[-106, 5, 4, colors.secondary], [119, -38, 4, colors.primary], [96, 40, 4, colors.secondary]], colors.secondary, 4, 0.78)}
+      ${threadPath("M-118 -34 C-87 -62 -57 -62 -28 -34 S27 -7 57 -34 S105 -61 130 -39", colors.secondary, 7.6, texture)}
+      ${threadPath("M-121 5 C-87 -27 -47 -27 -12 5 S50 41 92 7", colors.primary, 7.6, texture)}
+      ${continuousPath("M-102 45 C-66 18 -31 18 5 45 S67 72 106 39", colors.accent, 5.2)}
+      ${continuousPath("M-93 -4 H-67 V20 H-42 M-14 -39 H13 V-15 H37 M35 38 H61 V58 H89", colors.light, 2.8, `opacity="0.5"`)}
+      ${motifDiamond(-106, 5, 3.6, colors.secondary, 0.74)}
+      ${motifDiamond(119, -38, 3.6, colors.primary, 0.74)}
     </g>
   `;
 }
 
 function hornMotif(colors, texture) {
-  const sideDots = [
-    [-61, -31, 3.2],
-    [-43, -16, 2.8],
-    [-26, 4, 2.8],
-    [-14, 27, 3],
-    [61, -31, 3.2],
-    [43, -16, 2.8],
-    [26, 4, 2.8],
-    [14, 27, 3],
-  ];
-
+  const horn = "M0 66 C-18 15 -67 -3 -90 -58 C-48 -46 -14 -28 0 4 C14 -28 48 -46 90 -58 C67 -3 18 15 0 66Z";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M0 67 C-17 15 -67 -2 -90 -59 C-48 -47 -14 -29 0 4 C14 -29 48 -47 90 -59 C67 -2 17 15 0 67Z" fill="${colors.primary}" opacity="0.16" />
-      ${threadPath("M0 67 C-17 15 -67 -2 -90 -59 C-48 -47 -14 -29 0 4 C14 -29 48 -47 90 -59 C67 -2 17 15 0 67Z", colors.primary, 9, texture)}
-      ${threadPath("M0 50 C-8 16 -38 -5 -61 -33 M0 50 C8 16 38 -5 61 -33", colors.secondary, 4.8, "split")}
-      ${threadPath("M-33 24 C-12 5 12 5 33 24 M-46 43 C-17 25 17 25 46 43", colors.accent, 5.4, texture)}
-      ${threadPath("M-73 -48 C-52 -39 -35 -27 -24 -11 M73 -48 C52 -39 35 -27 24 -11", colors.light, 3.2, "split", `opacity="0.72"`)}
-      ${motifDots(sideDots, colors.light, 2.8, 0.86)}
-      ${motifDiamonds([[0, 4, 5, colors.accent], [0, 34, 4, colors.light], [-24, 45, 3.8, colors.secondary], [24, 45, 3.8, colors.secondary]], colors.accent, 4, 0.86)}
-      ${threadPath("M-13 58 L0 75 L13 58", colors.dark, 3.4, "split", `opacity="0.54"`)}
+      <path d="${horn}" fill="${colors.primary}" opacity="0.16" />
+      ${threadPath(horn, colors.primary, 8.4, texture)}
+      ${continuousPath("M0 50 C-8 16 -38 -5 -61 -33 M0 50 C8 16 38 -5 61 -33", colors.secondary, 4.4)}
+      ${continuousPath("M-33 24 C-12 5 12 5 33 24 M-46 43 C-17 25 17 25 46 43", colors.accent, 4.8)}
+      ${continuousPath("M-73 -48 C-52 -39 -35 -27 -24 -11 M73 -48 C52 -39 35 -27 24 -11", colors.light, 2.8, `opacity="0.62"`)}
+      ${motifDiamond(0, 4, 4.6, colors.accent, 0.82)}
+      ${motifDiamond(0, 34, 3.8, colors.light, 0.76)}
+      ${continuousPath("M-13 58 L0 74 L13 58", colors.dark, 2.8, `opacity="0.45"`)}
     </g>
   `;
 }
 
 function humanMotif(colors, texture) {
-  const costumeDots = [
-    [-20, -12, 2.8, colors.light],
-    [0, -8, 3, colors.accent],
-    [20, -12, 2.8, colors.light],
-    [-27, 20, 2.8, colors.secondary],
-    [0, 25, 3, colors.light],
-    [27, 20, 2.8, colors.secondary],
-    [-38, 57, 2.8, colors.light],
-    [-13, 62, 2.8, colors.accent],
-    [13, 62, 2.8, colors.accent],
-    [38, 57, 2.8, colors.light],
-  ];
-
+  const head = "M-29 -63 C-18 -88 18 -88 29 -63 L17 -40 H-17Z";
+  const robe = "M0 -36 L41 8 L25 68 H-25 L-41 8Z";
   return `
     <g filter="url(#threadShadow)">
-      <path d="M-30 -63 C-19 -91 19 -91 30 -63 L18 -39 L-18 -39Z" fill="${colors.secondary}" opacity="0.18" />
-      ${threadPath("M-30 -63 C-19 -91 19 -91 30 -63 L18 -39 L-18 -39Z", colors.secondary, 6.5, texture)}
-      ${threadPath("M-43 -70 H43 M-30 -82 L-14 -68 M30 -82 L14 -68", colors.accent, 4, "split", `opacity="0.84"`)}
-      <path d="M0 -36 L42 8 L26 68 H-26 L-42 8Z" fill="${colors.primary}" opacity="0.17" />
-      ${threadPath("M0 -36 L42 8 L26 68 H-26 L-42 8Z", colors.primary, 8, texture)}
-      ${threadPath("M0 -31 V67 M-33 13 H33 M-24 42 H24", colors.light, 3.2, "split", `opacity="0.72"`)}
-      ${threadPath("M-28 -2 C-56 -14 -69 6 -83 29 M28 -2 C56 -14 69 6 83 29", colors.primary, 7.5, texture)}
-      ${threadPath("M-82 29 L-100 23 M82 29 L100 23", colors.accent, 4, "split", `opacity="0.86"`)}
-      ${threadPath("M-24 68 L-45 88 M24 68 L45 88 M-5 68 L-16 89 M5 68 L16 89", colors.accent, 4.6, "split")}
-      ${motifDots(costumeDots, colors.light, 2.8, 0.86)}
-      ${motifDiamonds([[0, -22, 4, colors.light], [-17, 37, 3.5, colors.light], [17, 37, 3.5, colors.light], [0, 51, 4, colors.accent]], colors.light, 4, 0.84)}
-      ${threadPath("M-12 -64 L-3 -54 L12 -66", colors.dark, 3.4, "split", `opacity="0.78"`)}
-      <circle cx="0" cy="-61" r="4" fill="${colors.light}" opacity="0.88" />
+      <path d="${head}" fill="${colors.secondary}" opacity="0.17" />
+      ${threadPath(head, colors.secondary, 6.2, texture)}
+      ${continuousPath("M-41 -70 H41 M-29 -81 L-13 -68 M29 -81 L13 -68", colors.accent, 3.6, `opacity="0.78"`)}
+      <path d="${robe}" fill="${colors.primary}" opacity="0.16" />
+      ${threadPath(robe, colors.primary, 7.5, texture)}
+      ${continuousPath("M0 -31 V67 M-32 13 H32 M-23 42 H23", colors.light, 2.9, `opacity="0.64"`)}
+      ${continuousPath("M-27 -2 C-55 -14 -69 6 -83 29 M27 -2 C55 -14 69 6 83 29", colors.primary, 6.8)}
+      ${continuousPath("M-24 68 L-45 88 M24 68 L45 88 M-5 68 L-15 88 M5 68 L15 88", colors.accent, 4.1)}
+      ${motifDiamond(0, -22, 3.8, colors.light, 0.78)}
+      ${motifDiamond(0, 51, 3.8, colors.accent, 0.78)}
+      ${continuousPath("M-12 -64 L-3 -54 L12 -66", colors.dark, 2.8, `opacity="0.64"`)}
+      ${motifDot(0, -61, 2.6, colors.light, 0.86)}
     </g>
   `;
 }
