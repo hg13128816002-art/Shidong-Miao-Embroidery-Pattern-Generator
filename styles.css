@@ -521,7 +521,7 @@ input:focus-visible {
 .pattern-frame.is-card-switching::before {
   animation:
     framePulse 4.8s ease-in-out infinite,
-    stackPeek 900ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+    stackPeek 820ms ease-out both;
 }
 
 .pattern-frame::after {
@@ -541,7 +541,7 @@ input:focus-visible {
 .pattern-frame.is-card-switching::after {
   animation:
     stitchWalk 8s steps(28) infinite,
-    stitchKick 900ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+    stitchKick 820ms ease-out both;
 }
 
 .pattern-output {
@@ -559,11 +559,11 @@ input:focus-visible {
 }
 
 .pattern-frame.is-card-switching .pattern-output::before {
-  animation: backCardLift 900ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+  animation: backCardLift 820ms ease-out both;
 }
 
 .pattern-frame.is-card-switching .pattern-output::after {
-  animation: deepCardLift 900ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+  animation: deepCardLift 820ms ease-out both;
 }
 
 .pattern-output::before,
@@ -604,12 +604,12 @@ input:focus-visible {
 
 .pattern-card-in {
   z-index: 2;
-  animation: cardRiseFront 900ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+  animation: patternDyeIn 780ms cubic-bezier(0.22, 0.72, 0.2, 1) both;
 }
 
 .pattern-card-out {
   z-index: 3;
-  animation: cardToBack 520ms cubic-bezier(0.16, 0.78, 0.18, 1) both;
+  animation: patternDyeOut 620ms ease-in both;
 }
 
 .pattern-card svg {
@@ -759,67 +759,61 @@ input:focus-visible {
   }
 }
 
-@keyframes cardRiseFront {
+@keyframes patternDyeIn {
   from {
-    opacity: 0.62;
-    transform: translate(58px, 46px) scale(0.88) rotate(2.8deg);
+    opacity: 0;
+    filter: saturate(0.72) brightness(0.82) blur(0.8px);
+    transform: scale(0.998);
   }
-  58% {
-    opacity: 1;
-    transform: translate(-8px, -8px) scale(1.018) rotate(-0.35deg);
+  54% {
+    opacity: 0.78;
+    filter: saturate(0.9) brightness(0.94) blur(0.22px);
   }
   to {
     opacity: 1;
-    transform: translate(0, 0) scale(1) rotate(0);
+    filter: saturate(1) brightness(1) blur(0);
+    transform: scale(1);
   }
 }
 
-@keyframes cardToBack {
+@keyframes patternDyeOut {
   from {
     opacity: 1;
-    transform: translate(0, 0) scale(1) rotate(0);
+    filter: saturate(1) brightness(1) blur(0);
+    transform: scale(1);
   }
-  42% {
-    opacity: 0.42;
-    transform: translate(-76px, -42px) scale(0.94) rotate(-4deg);
-  }
-  72% {
-    opacity: 0;
-    transform: translate(34px, 30px) scale(0.88) rotate(2deg);
+  58% {
+    opacity: 0.36;
+    filter: saturate(0.86) brightness(0.82) blur(0.25px);
   }
   to {
     opacity: 0;
-    transform: translate(58px, 48px) scale(0.84) rotate(3deg);
+    filter: saturate(0.72) brightness(0.68) blur(0.7px);
+    transform: scale(1.002);
   }
 }
 
 @keyframes backCardLift {
-  0% {
-    transform: translate(14px, 14px) scale(0.97);
-    opacity: 0.58;
-  }
-  45% {
-    transform: translate(5px, 5px) scale(0.992);
-    opacity: 0.82;
-  }
+  0%,
   100% {
     transform: translate(14px, 14px) scale(0.97);
     opacity: 0.58;
+  }
+  50% {
+    transform: translate(13px, 13px) scale(0.972);
+    opacity: 0.66;
   }
 }
 
 @keyframes deepCardLift {
-  0% {
-    transform: translate(26px, 26px) scale(0.94);
-    opacity: 0.32;
-  }
-  45% {
-    transform: translate(15px, 15px) scale(0.965);
-    opacity: 0.5;
-  }
+  0%,
   100% {
     transform: translate(26px, 26px) scale(0.94);
     opacity: 0.32;
+  }
+  50% {
+    transform: translate(25px, 25px) scale(0.942);
+    opacity: 0.38;
   }
 }
 
@@ -828,8 +822,8 @@ input:focus-visible {
   100% {
     opacity: 0.35;
   }
-  45% {
-    opacity: 0.9;
+  50% {
+    opacity: 0.52;
   }
 }
 
@@ -838,8 +832,8 @@ input:focus-visible {
   100% {
     opacity: 0.7;
   }
-  45% {
-    opacity: 1;
+  50% {
+    opacity: 0.84;
   }
 }
 

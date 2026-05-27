@@ -423,7 +423,7 @@ function renderPatternCard(nextSvg) {
 
     outgoingCard?.remove();
     elements.patternFrame.classList.remove("is-card-switching");
-  }, 980);
+  }, 820);
 }
 
 function syncControls() {
