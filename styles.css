@@ -476,6 +476,11 @@ input:focus-visible {
   pointer-events: none;
 }
 
+.motif-choice.is-disabled span {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
 .motif-choice span {
   min-height: 46px;
   display: flex;

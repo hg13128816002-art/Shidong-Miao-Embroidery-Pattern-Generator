@@ -133,13 +133,16 @@ const palettes = [
   },
 ];
 
+const SPECIAL_MAPLE_MOTIF = "maple";
+const MAPLE_PRESET_ID = "festival-full";
+
 const presets = [
   {
     id: "festival-full",
     name: "节庆满绣",
     detail: "高密度团花",
     apply: {
-      motifs: ["dragon", "butterfly", "maple", "fish", "flower", "horn"],
+      motifs: ["maple", "dragon", "butterfly", "fish", "flower", "horn"],
       layout: "radial",
       palette: "festival",
       texture: "stack",
@@ -169,7 +172,7 @@ const presets = [
     name: "母花素稿",
     detail: "线稿式构成",
     apply: {
-      motifs: ["maple", "dragon", "horn", "flower", "human"],
+      motifs: ["dragon", "horn", "flower", "human"],
       layout: "repeat",
       palette: "mother",
       texture: "split",
@@ -461,6 +464,7 @@ function bindEvents() {
 }
 
 function renderApp(updateUrl = true) {
+  enforceMapleMotifRules();
   syncControls();
   syncControlTabs();
   renderPatternCard(buildPatternSvg(state));
@@ -504,8 +508,17 @@ function renderPatternCard(nextSvg) {
 }
 
 function syncControls() {
+  const mapleAllowed = isMapleMotifAllowed();
+
   document.querySelectorAll("[data-motif]").forEach((input) => {
+    const isMapleInput = input.value === SPECIAL_MAPLE_MOTIF;
     input.checked = state.motifs.includes(input.value);
+    input.disabled = isMapleInput && !mapleAllowed;
+    input.closest(".motif-choice")?.classList.toggle("is-disabled", input.disabled);
+    input.closest(".motif-choice")?.setAttribute(
+      "title",
+      input.disabled ? "枫香树纹仅在节庆满绣预设中作为中心纹样使用" : "",
+    );
   });
 
   setPressed("[data-layout]", "layout");
@@ -529,6 +542,22 @@ function syncControlTabs() {
   elements.controlPanels.forEach((panel) => {
     panel.hidden = panel.dataset.controlPanel !== activeControlTab;
   });
+}
+
+function enforceMapleMotifRules() {
+  if (isMapleMotifAllowed()) return;
+
+  state.motifs = state.motifs.filter((id) => id !== SPECIAL_MAPLE_MOTIF);
+  if (!state.motifs.length) state.motifs = [motifs[0].id];
+}
+
+function isMapleMotifAllowed() {
+  return getActivePresetId() === MAPLE_PRESET_ID;
+}
+
+function getSupportingMotifs(selected) {
+  const supporting = selected.filter((id) => id !== SPECIAL_MAPLE_MOTIF);
+  return supporting.length ? supporting : [motifs[0].id];
 }
 
 function setPressed(selector, key) {
@@ -602,7 +631,7 @@ function renderCulture() {
 function randomize() {
   const rng = mulberry32(Date.now());
   const motifCount = randomInt(rng, 3, 6);
-  const shuffled = [...motifs].sort(() => rng() - 0.5);
+  const shuffled = motifs.filter((motif) => motif.id !== SPECIAL_MAPLE_MOTIF).sort(() => rng() - 0.5);
   state = {
     ...state,
     motifs: shuffled.slice(0, motifCount).map((motif) => motif.id),
@@ -671,9 +700,10 @@ function buildLayout(config, colors, rng) {
 
 function buildRadialLayout(config, colors, rng) {
   const selected = config.motifs;
+  const supportingMotifs = getSupportingMotifs(selected);
   const ringCount = Math.round(8 + config.density * 12);
   const innerCount = Math.round(4 + config.complexity * 6);
-  const center = selected[0] || "dragon";
+  const center = selected.includes(SPECIAL_MAPLE_MOTIF) ? SPECIAL_MAPLE_MOTIF : supportingMotifs[0];
   let svg = "";
 
   svg += placeMotif(center, 450, 450, 1.72, 0, colors, config.texture, rng, 0);
@@ -682,7 +712,7 @@ function buildRadialLayout(config, colors, rng) {
   for (let i = 0; i < ringCount; i += 1) {
     const angle = (Math.PI * 2 * i) / ringCount;
     const radius = 250 + wave(i, rng) * 20;
-    const motif = selected[i % selected.length];
+    const motif = supportingMotifs[i % supportingMotifs.length];
     const scale = 0.62 + rng() * 0.22 + config.complexity * 0.12;
     svg += placeMotif(
       motif,
@@ -699,7 +729,7 @@ function buildRadialLayout(config, colors, rng) {
 
   for (let i = 0; i < innerCount; i += 1) {
     const angle = (Math.PI * 2 * (i + 0.5)) / innerCount;
-    const motif = selected[(i + 2) % selected.length];
+    const motif = supportingMotifs[(i + 2) % supportingMotifs.length];
     svg += placeMotif(
       motif,
       450 + Math.cos(angle) * 130,
@@ -713,12 +743,12 @@ function buildRadialLayout(config, colors, rng) {
     );
   }
 
-  if (config.border) svg += buildBorder(colors, config.texture, selected, rng, Math.round(12 + config.density * 14));
+  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(12 + config.density * 14));
   return svg;
 }
 
 function buildRepeatLayout(config, colors, rng) {
-  const selected = config.motifs;
+  const selected = getSupportingMotifs(config.motifs);
   const cells = Math.round(3 + config.density * 3);
   const gap = 760 / cells;
   let svg = "";
@@ -741,7 +771,7 @@ function buildRepeatLayout(config, colors, rng) {
 }
 
 function buildApronLayout(config, colors, rng) {
-  const selected = config.motifs;
+  const selected = getSupportingMotifs(config.motifs);
   const rows = 4 + Math.round(config.density * 3);
   let svg = "";
 
@@ -765,7 +795,7 @@ function buildApronLayout(config, colors, rng) {
 }
 
 function buildRiverLayout(config, colors, rng) {
-  const selected = config.motifs;
+  const selected = getSupportingMotifs(config.motifs);
   const flowCount = Math.round(4 + config.density * 5);
   let svg = "";
 
