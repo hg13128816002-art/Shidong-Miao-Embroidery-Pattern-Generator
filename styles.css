@@ -14,12 +14,105 @@
   --gold: #d0a349;
   --indigo: #6c7ab8;
   --rose-wash: #4a242a;
+  --body-bg: #100d0c;
+  --button-hover: #362925;
+  --primary-hover: #d1495b;
+  --focus-ring: rgba(31, 111, 104, 0.24);
+  --on-accent: #fff7e8;
+  --tab-bg: #241b18;
+  --tab-hover: #332722;
+  --choice-hover: #342824;
+  --frame-bg: #211917;
+  --frame-line: rgba(208, 163, 73, 0.16);
+  --stack-card-bg: #171211;
+  --canvas-shadow: drop-shadow(0 24px 34px rgba(0, 0, 0, 0.34));
+  --toast-bg: #2f2420;
+  --toast-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+  --stitch-teal: rgba(75, 155, 145, 0.85);
+  --stitch-carmine: rgba(198, 60, 77, 0.8);
+  color-scheme: dark;
   --radius: 8px;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
   --soft-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
   font-family:
     Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui,
     -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+:root[data-theme="light"] {
+  --ink: #211712;
+  --muted: #6f5e4e;
+  --line: #dbc8ad;
+  --paper: #f5ead8;
+  --panel: #fff8ea;
+  --panel-strong: #efe0c7;
+  --surface: #f7ecd9;
+  --surface-raised: #eadbc3;
+  --carmine: #b93143;
+  --carmine-deep: #8f2534;
+  --teal: #247a72;
+  --teal-deep: #1d5f59;
+  --gold: #9a6b16;
+  --indigo: #5968a8;
+  --rose-wash: #ead0d1;
+  --body-bg: #f2e5cf;
+  --button-hover: #dfcfb5;
+  --primary-hover: #c94052;
+  --focus-ring: rgba(36, 122, 114, 0.26);
+  --on-accent: #fff8ec;
+  --tab-bg: #eadbc3;
+  --tab-hover: #dfcfb5;
+  --choice-hover: #dfcfb5;
+  --frame-bg: #fff4df;
+  --frame-line: rgba(154, 107, 22, 0.22);
+  --stack-card-bg: #eadcc6;
+  --canvas-shadow: drop-shadow(0 20px 30px rgba(90, 55, 25, 0.16));
+  --toast-bg: #fff8ea;
+  --toast-shadow: 0 16px 34px rgba(90, 55, 25, 0.18);
+  --stitch-teal: rgba(36, 122, 114, 0.82);
+  --stitch-carmine: rgba(185, 49, 67, 0.78);
+  --shadow: 0 24px 70px rgba(90, 55, 25, 0.18);
+  --soft-shadow: 0 14px 34px rgba(90, 55, 25, 0.12);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --ink: #211712;
+    --muted: #6f5e4e;
+    --line: #dbc8ad;
+    --paper: #f5ead8;
+    --panel: #fff8ea;
+    --panel-strong: #efe0c7;
+    --surface: #f7ecd9;
+    --surface-raised: #eadbc3;
+    --carmine: #b93143;
+    --carmine-deep: #8f2534;
+    --teal: #247a72;
+    --teal-deep: #1d5f59;
+    --gold: #9a6b16;
+    --indigo: #5968a8;
+    --rose-wash: #ead0d1;
+    --body-bg: #f2e5cf;
+    --button-hover: #dfcfb5;
+    --primary-hover: #c94052;
+    --focus-ring: rgba(36, 122, 114, 0.26);
+    --on-accent: #fff8ec;
+    --tab-bg: #eadbc3;
+    --tab-hover: #dfcfb5;
+    --choice-hover: #dfcfb5;
+    --frame-bg: #fff4df;
+    --frame-line: rgba(154, 107, 22, 0.22);
+    --stack-card-bg: #eadcc6;
+    --canvas-shadow: drop-shadow(0 20px 30px rgba(90, 55, 25, 0.16));
+    --toast-bg: #fff8ea;
+    --toast-shadow: 0 16px 34px rgba(90, 55, 25, 0.18);
+    --stitch-teal: rgba(36, 122, 114, 0.82);
+    --stitch-carmine: rgba(185, 49, 67, 0.78);
+    --shadow: 0 24px 70px rgba(90, 55, 25, 0.18);
+    --soft-shadow: 0 14px 34px rgba(90, 55, 25, 0.12);
+    color-scheme: light;
+  }
 }
 
 * {
@@ -30,7 +123,7 @@ body {
   min-width: 320px;
   margin: 0;
   color: var(--ink);
-  background: #100d0c;
+  background: var(--body-bg);
 }
 
 button,
@@ -124,14 +217,14 @@ button {
 }
 
 .button span,
-.icon-button {
+.icon-button span {
   transition: transform 180ms ease;
 }
 
 .button:hover,
 .icon-button:hover {
   transform: translateY(-1px);
-  background: #362925;
+  background: var(--button-hover);
 }
 
 .button:active,
@@ -151,18 +244,18 @@ button {
 .button:focus-visible,
 .icon-button:focus-visible,
 input:focus-visible {
-  outline: 3px solid rgba(31, 111, 104, 0.24);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 .button-primary {
-  color: #fff7e8;
+  color: var(--on-accent);
   background: var(--carmine);
   box-shadow: none;
 }
 
 .button-primary:hover {
-  background: #d1495b;
+  background: var(--primary-hover);
 }
 
 .studio {
@@ -249,7 +342,7 @@ input:focus-visible {
   border: 0;
   border-radius: var(--radius);
   color: var(--muted);
-  background: #241b18;
+  background: var(--tab-bg);
   cursor: pointer;
   font-size: 13px;
   font-weight: 800;
@@ -261,12 +354,12 @@ input:focus-visible {
 
 .control-tabs button:hover {
   color: var(--ink);
-  background: #332722;
+  background: var(--tab-hover);
   transform: translateY(-1px);
 }
 
 .control-tabs button[aria-pressed="true"] {
-  color: #fff7e8;
+  color: var(--on-accent);
   background: var(--teal-deep);
 }
 
@@ -336,7 +429,7 @@ input:focus-visible {
 .motif-choice:hover,
 .palette-choice:hover {
   transform: translateY(-1px);
-  background: #342824;
+  background: var(--choice-hover);
   box-shadow: none;
 }
 
@@ -488,6 +581,17 @@ input:focus-visible {
   font-size: 18px;
 }
 
+.theme-button {
+  flex: 0 0 40px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.theme-button:hover {
+  color: var(--ink);
+}
+
 .pattern-frame {
   min-height: 0;
   flex: 1;
@@ -498,7 +602,7 @@ input:focus-visible {
   padding: clamp(10px, 2.2vw, 24px);
   border: 0;
   border-radius: var(--radius);
-  background: #211917;
+  background: var(--frame-bg);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
@@ -513,7 +617,7 @@ input:focus-visible {
 
 .pattern-frame::before {
   inset: 12px;
-  border: 1px solid rgba(208, 163, 73, 0.16);
+  border: 1px solid var(--frame-line);
   border-radius: var(--radius);
   animation: framePulse 4.8s ease-in-out infinite;
 }
@@ -532,8 +636,8 @@ input:focus-visible {
   border-radius: 2px;
   background: var(--gold);
   box-shadow:
-    18px 0 0 rgba(75, 155, 145, 0.85),
-    36px 0 0 rgba(198, 60, 77, 0.8);
+    18px 0 0 var(--stitch-teal),
+    36px 0 0 var(--stitch-carmine);
   opacity: 0.7;
   animation: stitchWalk 8s steps(28) infinite;
 }
@@ -554,7 +658,7 @@ input:focus-visible {
   place-items: center;
   isolation: isolate;
   perspective: 1100px;
-  filter: drop-shadow(0 24px 34px rgba(0, 0, 0, 0.34));
+  filter: var(--canvas-shadow);
   animation: patternBreath 7s ease-in-out infinite;
 }
 
@@ -573,7 +677,7 @@ input:focus-visible {
   z-index: -1;
   content: "";
   border-radius: var(--radius);
-  background: #171211;
+  background: var(--stack-card-bg);
   pointer-events: none;
 }
 
@@ -704,11 +808,11 @@ input:focus-visible {
   opacity: 0;
   pointer-events: none;
   color: var(--ink);
-  background: #2f2420;
+  background: var(--toast-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 12px 14px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+  box-shadow: var(--toast-shadow);
   transition:
     opacity 180ms ease,
     transform 180ms ease;

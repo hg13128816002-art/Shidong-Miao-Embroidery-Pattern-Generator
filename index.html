@@ -8,6 +8,17 @@
       content="施洞苗绣纹样生成器：选择纹样、配色、构图与刺绣质感，组合生成个性化苗族刺绣风格图案。"
     />
     <title>施洞苗绣纹样生成器</title>
+    <script>
+      (() => {
+        try {
+          const theme = localStorage.getItem("miao-theme");
+          if (theme === "light" || theme === "dark") {
+            document.documentElement.dataset.theme = theme;
+          }
+        } catch {
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -21,6 +32,9 @@
         </a>
 
         <div class="top-actions">
+          <button class="icon-button theme-button" id="themeButton" type="button" aria-label="切换主题" title="切换主题">
+            <span aria-hidden="true">◐</span>
+          </button>
           <button class="button button-primary" id="randomizeButton" type="button">
             <span aria-hidden="true">↻</span>
             生成纹样

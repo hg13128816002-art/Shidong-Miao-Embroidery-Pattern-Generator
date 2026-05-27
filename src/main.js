@@ -207,6 +207,8 @@ let state = readStateFromUrl();
 let toastTimer = null;
 let activeControlTab = "preset";
 let patternAnimationTimer = null;
+const THEME_STORAGE_KEY = "miao-theme";
+const systemThemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
 const elements = {
   presetControls: document.querySelector("#presetControls"),
@@ -234,14 +236,83 @@ const elements = {
   shareButton: document.querySelector("#shareButton"),
   resetButton: document.querySelector("#resetButton"),
   toast: document.querySelector("#toast"),
+  themeButton: document.querySelector("#themeButton"),
 };
 
 init();
 
 function init() {
+  initTheme();
   renderControls();
   bindEvents();
   renderApp();
+}
+
+function initTheme() {
+  syncThemeFromStorage();
+  updateThemeButton();
+
+  if (!systemThemeQuery) return;
+
+  const onSystemThemeChange = () => {
+    if (!getStoredTheme()) updateThemeButton();
+  };
+
+  if (systemThemeQuery.addEventListener) {
+    systemThemeQuery.addEventListener("change", onSystemThemeChange);
+  } else if (systemThemeQuery.addListener) {
+    systemThemeQuery.addListener(onSystemThemeChange);
+  }
+}
+
+function syncThemeFromStorage() {
+  const storedTheme = getStoredTheme();
+  if (storedTheme) {
+    document.documentElement.dataset.theme = storedTheme;
+    return;
+  }
+
+  delete document.documentElement.dataset.theme;
+}
+
+function getStoredTheme() {
+  try {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    return storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+  } catch {
+    return null;
+  }
+}
+
+function getResolvedTheme() {
+  const explicitTheme = document.documentElement.dataset.theme;
+  if (explicitTheme === "light" || explicitTheme === "dark") return explicitTheme;
+  return systemThemeQuery?.matches ? "dark" : "light";
+}
+
+function toggleTheme() {
+  const nextTheme = getResolvedTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = nextTheme;
+
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  } catch {
+    // Keep the visible theme change even when storage is unavailable.
+  }
+
+  updateThemeButton();
+  showToast(nextTheme === "dark" ? "已切换为深色主题" : "已切换为浅色主题");
+}
+
+function updateThemeButton() {
+  if (!elements.themeButton) return;
+
+  const resolvedTheme = getResolvedTheme();
+  const nextThemeLabel = resolvedTheme === "dark" ? "浅色" : "深色";
+  elements.themeButton.dataset.theme = resolvedTheme;
+  elements.themeButton.querySelector("span").textContent = resolvedTheme === "dark" ? "暗" : "亮";
+  elements.themeButton.setAttribute("aria-label", "切换为" + nextThemeLabel + "主题");
+  elements.themeButton.title = "切换为" + nextThemeLabel + "主题";
 }
 
 function renderControls() {
@@ -381,6 +452,7 @@ function bindEvents() {
   });
   elements.downloadButton.addEventListener("click", downloadPng);
   elements.shareButton.addEventListener("click", copyShareLink);
+  elements.themeButton.addEventListener("click", toggleTheme);
 }
 
 function renderApp(updateUrl = true) {
