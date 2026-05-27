@@ -140,14 +140,14 @@ const presets = [
   {
     id: "festival-full",
     name: "节庆满绣",
-    detail: "中心团花",
+    detail: "花团锦簇",
     apply: {
       motifs: ["maple", "dragon", "butterfly", "fish", "flower", "horn"],
       layout: "radial",
       palette: "festival",
       texture: "stack",
-      density: 0.72,
-      complexity: 0.6,
+      density: 0.78,
+      complexity: 0.66,
       symmetry: true,
       border: true,
     },
@@ -722,19 +722,35 @@ function buildRadialLayout(config, colors, rng) {
 
   const selected = config.motifs;
   const supportingMotifs = getSupportingMotifs(selected);
-  const ringCount = Math.round(6 + config.density * 6);
-  const innerCount = config.density > 0.58 ? 4 : 0;
+  const ringCount = Math.round(8 + config.density * 8);
+  const innerCount = config.density > 0.52 ? 6 : 4;
   const center = supportingMotifs[0];
   let svg = "";
 
-  svg += buildRadialGuidework(450, 450, 150, 292, colors, config.texture, 8, 0.38);
-  svg += placeMotif(center, 450, 450, 1.04 + config.complexity * 0.24, 0, colors, config.texture, rng, 0);
+  svg += buildRadialBloomBed(450, 450, 132, 318, colors, config.texture, 12, 0.34);
+  svg += placeMotif(center, 450, 450, 1.18 + config.complexity * 0.28, 0, colors, config.texture, rng, 0);
+
+  for (let i = 0; i < innerCount; i += 1) {
+    const angle = (Math.PI * 2 * (i + 0.5)) / innerCount;
+    const motif = supportingMotifs[(i + 2) % supportingMotifs.length];
+    svg += placeMotif(
+      motif,
+      450 + Math.cos(angle) * 178,
+      450 + Math.sin(angle) * 178,
+      0.34 + config.complexity * 0.1,
+      config.symmetry ? (angle * 180) / Math.PI : rng() * 360,
+      colors,
+      config.texture,
+      rng,
+      i + 20,
+    );
+  }
 
   for (let i = 0; i < ringCount; i += 1) {
     const angle = (Math.PI * 2 * i) / ringCount;
-    const radius = 258 + wave(i, rng) * 10;
+    const radius = 266 + (i % 2 ? 22 : -8) + wave(i, rng) * 8;
     const motif = supportingMotifs[(i + 1) % supportingMotifs.length];
-    const scale = 0.48 + config.complexity * 0.12 + rng() * 0.04;
+    const scale = 0.54 + config.complexity * 0.15 + rng() * 0.04;
     svg += placeMotif(
       motif,
       450 + Math.cos(angle) * radius,
@@ -748,23 +764,7 @@ function buildRadialLayout(config, colors, rng) {
     );
   }
 
-  for (let i = 0; i < innerCount; i += 1) {
-    const angle = (Math.PI * 2 * (i + 0.5)) / innerCount;
-    const motif = supportingMotifs[(i + 2) % supportingMotifs.length];
-    svg += placeMotif(
-      motif,
-      450 + Math.cos(angle) * 172,
-      450 + Math.sin(angle) * 172,
-      0.3 + config.complexity * 0.08,
-      config.symmetry ? (angle * 180) / Math.PI : rng() * 360,
-      colors,
-      config.texture,
-      rng,
-      i + 20,
-    );
-  }
-
-  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(5 + config.density * 4));
+  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(7 + config.density * 6));
   return svg;
 }
 
@@ -772,28 +772,42 @@ function buildFestivalRadialLayout(config, colors, rng) {
   const selected = getSupportingMotifs(config.motifs);
   const motif = (preferred, fallback = 0) => (selected.includes(preferred) ? preferred : selected[fallback % selected.length]);
   const anchorMotifs = [
-    [motif("flower", 0), 450, 210, 0.52, 0],
-    [motif("butterfly", 1), 690, 450, 0.52, 90],
-    [motif("flower", 2), 450, 690, 0.52, 180],
-    [motif("butterfly", 3), 210, 450, 0.52, -90],
-    [motif("dragon", 0), 286, 286, 0.42, -38],
-    [motif("fish", 1), 614, 286, 0.42, 38],
-    [motif("fish", 2), 614, 614, 0.42, 142],
-    [motif("horn", 3), 286, 614, 0.38, -142],
+    [motif("flower", 0), 450, 190, 0.62, 0],
+    [motif("butterfly", 1), 710, 450, 0.6, 90],
+    [motif("flower", 2), 450, 710, 0.62, 180],
+    [motif("butterfly", 3), 190, 450, 0.6, -90],
+    [motif("dragon", 0), 292, 292, 0.5, -36],
+    [motif("fish", 1), 608, 292, 0.5, 36],
+    [motif("fish", 2), 608, 608, 0.5, 144],
+    [motif("horn", 3), 292, 608, 0.46, -144],
+  ];
+  const outerBlooms = [
+    [motif("flower", 0), 450, 124, 0.24, 0],
+    [motif("horn", 1), 680, 220, 0.22, 42],
+    [motif("flower", 2), 776, 450, 0.24, 90],
+    [motif("horn", 3), 680, 680, 0.22, 138],
+    [motif("flower", 1), 450, 776, 0.24, 180],
+    [motif("horn", 2), 220, 680, 0.22, -138],
+    [motif("flower", 3), 124, 450, 0.24, -90],
+    [motif("horn", 0), 220, 220, 0.22, -42],
   ];
   let svg = "";
 
-  svg += `<circle cx="450" cy="450" r="308" fill="${colors.dark}" opacity="0.08" />`;
-  svg += buildRadialGuidework(450, 450, 176, 314, colors, config.texture, 8, 0.34);
-  svg += `<circle cx="450" cy="450" r="214" fill="${colors.light}" opacity="0.05" />`;
-  svg += `<circle cx="450" cy="450" r="306" fill="none" stroke="${colors.accent}" stroke-width="5" opacity="0.76" />`;
-  svg += `<circle cx="450" cy="450" r="228" fill="none" stroke="${colors.secondary}" stroke-width="4" opacity="0.58" />`;
+  svg += `<circle cx="450" cy="450" r="326" fill="${colors.dark}" opacity="0.08" />`;
+  svg += buildRadialBloomBed(450, 450, 158, 344, colors, config.texture, 16, 0.36);
+  svg += `<circle cx="450" cy="450" r="238" fill="${colors.light}" opacity="0.045" />`;
+  svg += threadPath("M210 450 C260 360 340 292 450 276 C560 292 640 360 690 450 C640 540 560 608 450 624 C340 608 260 540 210 450Z", colors.secondary, 5.2, config.texture, `opacity="0.68"`);
+  svg += threadPath("M450 196 C520 252 588 314 704 450 C588 586 520 648 450 704 C380 648 312 586 196 450 C312 314 380 252 450 196Z", colors.accent, 3.6, "continuous", `opacity="0.58"`);
+
+  outerBlooms.forEach(([id, x, y, scale, rotation], index) => {
+    svg += placeMotif(id, x, y, scale, rotation, colors, config.texture, rng, index + 60);
+  });
 
   anchorMotifs.forEach(([id, x, y, scale, rotation], index) => {
     svg += placeMotif(id, x, y, scale, rotation, colors, config.texture, rng, index + 10);
   });
 
-  svg += placeMotif(SPECIAL_MAPLE_MOTIF, 450, 450, 1.18, 0, colors, config.texture, rng, 0);
+  svg += placeMotif(SPECIAL_MAPLE_MOTIF, 450, 450, 1.28, 0, colors, config.texture, rng, 0);
   if (config.border) svg += buildFestivalBorder(colors, config.texture, selected, rng);
   return svg;
 }
@@ -847,14 +861,14 @@ function buildApronLayout(config, colors, rng) {
 
 function buildRiverLayout(config, colors, rng) {
   const selected = getSupportingMotifs(config.motifs);
-  const flowCount = Math.round(4 + config.density * 5);
+  const flowCount = Math.round(3 + config.density * 4);
   let svg = "";
 
   for (let i = 0; i < flowCount; i += 1) {
-    const y = 145 + i * (610 / Math.max(1, flowCount - 1));
-    const d = `M80 ${y} C210 ${y - 80}, 285 ${y + 95}, 420 ${y} S635 ${y - 92}, 820 ${y + 10}`;
-    svg += threadPath(d, colors.secondary, 10, config.texture, `opacity="0.72"`);
-    svg += threadPath(d, colors.accent, 3, "split", `opacity="0.66"`);
+    const y = 158 + i * (584 / Math.max(1, flowCount - 1));
+    const d = `M88 ${y} C220 ${y - 48}, 300 ${y + 58}, 430 ${y} S638 ${y - 54}, 812 ${y + 8}`;
+    svg += threadPath(d, colors.secondary, 5.8, "continuous", `opacity="0.34"`);
+    svg += threadPath(d, colors.accent, 2.1, "continuous", `opacity="0.26"`);
   }
 
   const count = Math.round(9 + config.density * 12);
@@ -1117,20 +1131,29 @@ function humanMotif(colors, texture) {
   `;
 }
 
-function buildRadialGuidework(cx, cy, innerRadius, outerRadius, colors, texture, spokes = 8, opacity = 0.36) {
-  let svg = `<g opacity="${opacity}">`;
-  svg += threadPath(`M${cx - outerRadius} ${cy} A${outerRadius} ${outerRadius} 0 1 0 ${cx + outerRadius} ${cy} A${outerRadius} ${outerRadius} 0 1 0 ${cx - outerRadius} ${cy}`, colors.secondary, 3.6, texture);
-  svg += threadPath(`M${cx - innerRadius} ${cy} A${innerRadius} ${innerRadius} 0 1 0 ${cx + innerRadius} ${cy} A${innerRadius} ${innerRadius} 0 1 0 ${cx - innerRadius} ${cy}`, colors.accent, 2.8, "continuous");
+function polarPoint(cx, cy, radius, angle) {
+  return [round(cx + Math.cos(angle) * radius), round(cy + Math.sin(angle) * radius)];
+}
 
-  for (let i = 0; i < spokes; i += 1) {
-    const angle = (Math.PI * 2 * i) / spokes;
-    const x1 = cx + Math.cos(angle) * innerRadius;
-    const y1 = cy + Math.sin(angle) * innerRadius;
-    const x2 = cx + Math.cos(angle) * outerRadius;
-    const y2 = cy + Math.sin(angle) * outerRadius;
-    svg += threadPath(`M${round(x1)} ${round(y1)} L${round(x2)} ${round(y2)}`, colors.dark, 2.2, "continuous", `opacity="0.52"`);
+function buildRadialBloomBed(cx, cy, innerRadius, outerRadius, colors, texture, petals = 12, opacity = 0.34) {
+  let svg = `<g opacity="${opacity}">`;
+  const step = (Math.PI * 2) / petals;
+
+  for (let i = 0; i < petals; i += 1) {
+    const angle = i * step;
+    const [x1, y1] = polarPoint(cx, cy, innerRadius, angle - step * 0.28);
+    const [x2, y2] = polarPoint(cx, cy, innerRadius, angle + step * 0.28);
+    const [tipX, tipY] = polarPoint(cx, cy, outerRadius, angle);
+    const [c1x, c1y] = polarPoint(cx, cy, innerRadius + (outerRadius - innerRadius) * 0.58, angle - step * 0.44);
+    const [c2x, c2y] = polarPoint(cx, cy, innerRadius + (outerRadius - innerRadius) * 0.58, angle + step * 0.44);
+    const d = `M${x1} ${y1} C${c1x} ${c1y} ${tipX} ${tipY} ${tipX} ${tipY} C${tipX} ${tipY} ${c2x} ${c2y} ${x2} ${y2}`;
+    const color = i % 2 ? colors.primary : colors.secondary;
+
+    svg += `<path d="${d}" fill="none" stroke="${color}" stroke-width="1" opacity="0.16" />`;
+    svg += threadPath(d, color, 3.2, texture, `opacity="0.72"`);
   }
 
+  svg += threadPath(`M${cx - innerRadius} ${cy} C${cx - innerRadius} ${cy - innerRadius * 0.55} ${cx + innerRadius} ${cy - innerRadius * 0.55} ${cx + innerRadius} ${cy} C${cx + innerRadius} ${cy + innerRadius * 0.55} ${cx - innerRadius} ${cy + innerRadius * 0.55} ${cx - innerRadius} ${cy}`, colors.accent, 2.8, "continuous", `opacity="0.64"`);
   svg += "</g>";
   return svg;
 }
