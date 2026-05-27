@@ -411,7 +411,17 @@ function renderPatternCard(nextSvg) {
   elements.patternFrame.classList.add("is-card-switching");
 
   patternAnimationTimer = window.setTimeout(() => {
-    elements.patternOutput.innerHTML = `<div class="pattern-card pattern-card-current">${nextSvg}</div>`;
+    const incomingCard = elements.patternOutput.querySelector(".pattern-card-in");
+    const outgoingCard = elements.patternOutput.querySelector(".pattern-card-out");
+
+    if (incomingCard) {
+      incomingCard.classList.remove("pattern-card-in");
+      incomingCard.classList.add("pattern-card-current");
+    } else {
+      elements.patternOutput.innerHTML = '<div class="pattern-card pattern-card-current">' + nextSvg + '</div>';
+    }
+
+    outgoingCard?.remove();
     elements.patternFrame.classList.remove("is-card-switching");
   }, 980);
 }
