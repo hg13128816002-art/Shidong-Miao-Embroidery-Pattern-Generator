@@ -140,14 +140,14 @@ const presets = [
   {
     id: "festival-full",
     name: "节庆满绣",
-    detail: "高密度团花",
+    detail: "中心团花",
     apply: {
       motifs: ["maple", "dragon", "butterfly", "fish", "flower", "horn"],
       layout: "radial",
       palette: "festival",
       texture: "stack",
-      density: 0.86,
-      complexity: 0.76,
+      density: 0.72,
+      complexity: 0.6,
       symmetry: true,
       border: true,
     },
@@ -556,6 +556,10 @@ function isMapleMotifAllowed() {
   return getActivePresetId() === MAPLE_PRESET_ID;
 }
 
+function isFestivalFullConfig(config) {
+  return config.layout === "radial" && config.motifs.includes(SPECIAL_MAPLE_MOTIF);
+}
+
 function getSupportingMotifs(selected) {
   const supporting = selected.filter((id) => id !== SPECIAL_MAPLE_MOTIF);
   return supporting.length ? supporting : [motifs[0].id];
@@ -714,21 +718,23 @@ function buildLayout(config, colors, rng) {
 }
 
 function buildRadialLayout(config, colors, rng) {
+  if (isFestivalFullConfig(config)) return buildFestivalRadialLayout(config, colors, rng);
+
   const selected = config.motifs;
   const supportingMotifs = getSupportingMotifs(selected);
-  const ringCount = Math.round(8 + config.density * 12);
-  const innerCount = Math.round(4 + config.complexity * 6);
-  const center = selected.includes(SPECIAL_MAPLE_MOTIF) ? SPECIAL_MAPLE_MOTIF : supportingMotifs[0];
+  const ringCount = Math.round(6 + config.density * 6);
+  const innerCount = config.density > 0.58 ? 4 : 0;
+  const center = supportingMotifs[0];
   let svg = "";
 
-  svg += placeMotif(center, 450, 450, 1.72, 0, colors, config.texture, rng, 0);
-  svg += buildRosette(450, 450, 168, colors, config.texture, rng);
+  svg += buildRadialGuidework(450, 450, 150, 292, colors, config.texture, 8, 0.38);
+  svg += placeMotif(center, 450, 450, 1.04 + config.complexity * 0.24, 0, colors, config.texture, rng, 0);
 
   for (let i = 0; i < ringCount; i += 1) {
     const angle = (Math.PI * 2 * i) / ringCount;
-    const radius = 250 + wave(i, rng) * 20;
-    const motif = supportingMotifs[i % supportingMotifs.length];
-    const scale = 0.62 + rng() * 0.22 + config.complexity * 0.12;
+    const radius = 258 + wave(i, rng) * 10;
+    const motif = supportingMotifs[(i + 1) % supportingMotifs.length];
+    const scale = 0.48 + config.complexity * 0.12 + rng() * 0.04;
     svg += placeMotif(
       motif,
       450 + Math.cos(angle) * radius,
@@ -738,7 +744,7 @@ function buildRadialLayout(config, colors, rng) {
       colors,
       config.texture,
       rng,
-      i,
+      i + 1,
     );
   }
 
@@ -747,9 +753,9 @@ function buildRadialLayout(config, colors, rng) {
     const motif = supportingMotifs[(i + 2) % supportingMotifs.length];
     svg += placeMotif(
       motif,
-      450 + Math.cos(angle) * 130,
-      450 + Math.sin(angle) * 130,
-      0.38 + config.density * 0.18,
+      450 + Math.cos(angle) * 172,
+      450 + Math.sin(angle) * 172,
+      0.3 + config.complexity * 0.08,
       config.symmetry ? (angle * 180) / Math.PI : rng() * 360,
       colors,
       config.texture,
@@ -758,7 +764,37 @@ function buildRadialLayout(config, colors, rng) {
     );
   }
 
-  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(12 + config.density * 14));
+  if (config.border) svg += buildBorder(colors, config.texture, supportingMotifs, rng, Math.round(5 + config.density * 4));
+  return svg;
+}
+
+function buildFestivalRadialLayout(config, colors, rng) {
+  const selected = getSupportingMotifs(config.motifs);
+  const motif = (preferred, fallback = 0) => (selected.includes(preferred) ? preferred : selected[fallback % selected.length]);
+  const anchorMotifs = [
+    [motif("flower", 0), 450, 210, 0.52, 0],
+    [motif("butterfly", 1), 690, 450, 0.52, 90],
+    [motif("flower", 2), 450, 690, 0.52, 180],
+    [motif("butterfly", 3), 210, 450, 0.52, -90],
+    [motif("dragon", 0), 286, 286, 0.42, -38],
+    [motif("fish", 1), 614, 286, 0.42, 38],
+    [motif("fish", 2), 614, 614, 0.42, 142],
+    [motif("horn", 3), 286, 614, 0.38, -142],
+  ];
+  let svg = "";
+
+  svg += `<circle cx="450" cy="450" r="308" fill="${colors.dark}" opacity="0.08" />`;
+  svg += buildRadialGuidework(450, 450, 176, 314, colors, config.texture, 8, 0.34);
+  svg += `<circle cx="450" cy="450" r="214" fill="${colors.light}" opacity="0.05" />`;
+  svg += `<circle cx="450" cy="450" r="306" fill="none" stroke="${colors.accent}" stroke-width="5" opacity="0.76" />`;
+  svg += `<circle cx="450" cy="450" r="228" fill="none" stroke="${colors.secondary}" stroke-width="4" opacity="0.58" />`;
+
+  anchorMotifs.forEach(([id, x, y, scale, rotation], index) => {
+    svg += placeMotif(id, x, y, scale, rotation, colors, config.texture, rng, index + 10);
+  });
+
+  svg += placeMotif(SPECIAL_MAPLE_MOTIF, 450, 450, 1.18, 0, colors, config.texture, rng, 0);
+  if (config.border) svg += buildFestivalBorder(colors, config.texture, selected, rng);
   return svg;
 }
 
@@ -1079,6 +1115,55 @@ function humanMotif(colors, texture) {
       ${motifDot(0, -61, 2.6, colors.light, 0.86)}
     </g>
   `;
+}
+
+function buildRadialGuidework(cx, cy, innerRadius, outerRadius, colors, texture, spokes = 8, opacity = 0.36) {
+  let svg = `<g opacity="${opacity}">`;
+  svg += threadPath(`M${cx - outerRadius} ${cy} A${outerRadius} ${outerRadius} 0 1 0 ${cx + outerRadius} ${cy} A${outerRadius} ${outerRadius} 0 1 0 ${cx - outerRadius} ${cy}`, colors.secondary, 3.6, texture);
+  svg += threadPath(`M${cx - innerRadius} ${cy} A${innerRadius} ${innerRadius} 0 1 0 ${cx + innerRadius} ${cy} A${innerRadius} ${innerRadius} 0 1 0 ${cx - innerRadius} ${cy}`, colors.accent, 2.8, "continuous");
+
+  for (let i = 0; i < spokes; i += 1) {
+    const angle = (Math.PI * 2 * i) / spokes;
+    const x1 = cx + Math.cos(angle) * innerRadius;
+    const y1 = cy + Math.sin(angle) * innerRadius;
+    const x2 = cx + Math.cos(angle) * outerRadius;
+    const y2 = cy + Math.sin(angle) * outerRadius;
+    svg += threadPath(`M${round(x1)} ${round(y1)} L${round(x2)} ${round(y2)}`, colors.dark, 2.2, "continuous", `opacity="0.52"`);
+  }
+
+  svg += "</g>";
+  return svg;
+}
+
+function buildFestivalBorder(colors, texture, selected, rng) {
+  const motif = (preferred, fallback = 0) => (selected.includes(preferred) ? preferred : selected[fallback % selected.length]);
+  const borderMotifs = [
+    [motif("flower", 0), 212, 106, 0.18, 0],
+    [motif("horn", 1), 450, 106, 0.17, 0],
+    [motif("flower", 2), 688, 106, 0.18, 0],
+    [motif("flower", 3), 212, 794, 0.18, 180],
+    [motif("horn", 0), 450, 794, 0.17, 180],
+    [motif("flower", 1), 688, 794, 0.18, 180],
+    [motif("flower", 2), 106, 212, 0.18, -90],
+    [motif("horn", 3), 106, 450, 0.17, -90],
+    [motif("flower", 0), 106, 688, 0.18, -90],
+    [motif("flower", 1), 794, 212, 0.18, 90],
+    [motif("horn", 2), 794, 450, 0.17, 90],
+    [motif("flower", 3), 794, 688, 0.18, 90],
+  ];
+  let svg = `<g opacity="0.92">`;
+
+  svg += `<rect x="82" y="82" width="736" height="736" fill="none" stroke="${colors.dark}" stroke-width="8" opacity="0.62" />`;
+  svg += `<rect x="104" y="104" width="692" height="692" fill="none" stroke="${colors.secondary}" stroke-width="5" opacity="0.72" />`;
+  svg += `<rect x="126" y="126" width="648" height="648" fill="none" stroke="${colors.accent}" stroke-width="3.5" opacity="0.72" />`;
+  svg += threadPath("M126 126 H774 M126 774 H774 M126 126 V774 M774 126 V774", colors.primary, 3.4, texture, `opacity="0.62"`);
+
+  borderMotifs.forEach(([id, x, y, scale, rotation], index) => {
+    svg += placeMotif(id, x, y, scale, rotation, colors, texture, rng, index + 80);
+  });
+
+  svg += "</g>";
+  return svg;
 }
 
 function buildRosette(cx, cy, radius, colors, texture, rng, opacity = 0.72) {
