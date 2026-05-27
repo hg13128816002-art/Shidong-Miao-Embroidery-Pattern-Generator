@@ -3,46 +3,55 @@ const motifs = [
     id: "dragon",
     name: "龙纹",
     note: "施洞纹样中龙纹常与族群身份、地域记忆和装饰秩序相关；本项目保留双角这一醒目的视觉识别。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E9%BE%99%E7%BA%B9.webp",
   },
   {
     id: "fish",
     name: "鱼纹",
-    note: "鱼纹是施洞苗绣中常见动物题材之一，适合与水纹、花纹组成连续的生活叙事。",
+    note: "鱼纹是施洞苗绣中常见动物题材之一，适合与水涡纹、花纹组成连续的生活叙事。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E9%B1%BC%E7%BA%B9.webp",
   },
   {
     id: "butterfly",
     name: "蝴蝶纹",
     note: "蝴蝶在苗族文化叙事中常被赋予生命繁衍和祖源想象，本项目采用对称翅形表现。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E8%9D%B4%E8%9D%B6%E7%BA%B9.webp",
   },
   {
     id: "bird",
     name: "鸟纹",
     note: "鸟纹在服饰刺绣中常以飞翔、守护或神鸟形象出现，适合作为构图中的动势元素。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E9%B8%9F%E7%BA%B9.webp",
   },
   {
     id: "flower",
     name: "花纹",
     note: "花纹适合填补满绣空间，也能连接动物、人物和几何边饰，让画面更繁而有序。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E8%8A%B1%E7%BA%B9.webp",
   },
   {
     id: "maple",
     name: "枫香树纹",
     note: "枫香树纹来自清水江流域苗族关于枫木、蝴蝶妈妈与祖源记忆的叙事。本项目以树芯、对称枝叶和枫香果点作抽象化表现。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E6%9E%AB%E9%A6%99%E6%A0%91%E7%BA%B9.webp",
   },
   {
     id: "water",
     name: "水涡纹",
-    note: "施洞位于清水江流域，水纹在这里可作为地域线索，连接贸易、生活和河流记忆。",
+    note: "施洞位于清水江流域，水涡纹在这里可作为地域线索，连接贸易、生活和河流记忆。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E6%B0%B4%E6%B6%A1%E7%BA%B9.webp",
   },
   {
     id: "horn",
     name: "牛角纹",
     note: "施洞龙纹常以牛角化的双角作为鲜明特征，本项目将其抽象为可重复的护符形纹样。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E7%89%9B%E8%A7%92%E7%BA%B9.webp",
   },
   {
     id: "human",
     name: "人物纹",
     note: "人物纹可指向族群首领、英雄和口传历史。本项目只做抽象化轮廓，避免误称具体传统图像。",
+    image: "https://zhao-portfolio-assets.oss-cn-beijing.aliyuncs.com/images/%E4%BA%BA%E7%89%A9%E7%BA%B9.webp",
   },
 ];
 
@@ -609,24 +618,26 @@ function renderMeta() {
 function renderCulture() {
   const layout = layouts.find((item) => item.id === state.layout);
   const texture = textures.find((item) => item.id === state.texture);
-  const visibleMotifs = state.motifs.slice(0, 3);
-  const hiddenCount = Math.max(0, state.motifs.length - visibleMotifs.length);
   elements.cultureIntro.textContent = `当前采用「${layout.name}」构图与「${texture.name}」质感，组合生成施洞苗绣风格的数字纹样。`;
-  elements.cultureList.innerHTML =
-    visibleMotifs
+  elements.cultureList.innerHTML = state.motifs
     .map((id) => {
       const motif = getMotif(id);
+      const image = motif.image
+        ? `
+          <figure class="culture-image">
+            <img src="${motif.image}" alt="苗绣实拍：${motif.name}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+          </figure>
+        `
+        : "";
       return `
         <article class="culture-card">
           <h3>${motif.name}</h3>
           <p>${motif.note}</p>
+          ${image}
         </article>
       `;
     })
-      .join("") +
-    (hiddenCount
-      ? `<p class="culture-more">另有 ${hiddenCount} 个辅助纹样参与生成。</p>`
-      : "");
+    .join("");
 }
 
 function randomize() {
