@@ -31,7 +31,7 @@ const motifs = [
   },
   {
     id: "water",
-    name: "水纹",
+    name: "水涡纹",
     note: "施洞位于清水江流域，水纹在这里可作为地域线索，连接贸易、生活和河流记忆。",
   },
   {
@@ -1056,14 +1056,20 @@ function mapleMotif(colors, texture) {
 }
 
 function waterMotif(colors, texture) {
+  const leftSpiral = "M-84 8 C-96 -18 -74 -42 -42 -42 C-8 -42 10 -12 -8 12 C-24 33 -56 27 -57 2 C-58 -15 -34 -21 -25 -8 C-18 3 -29 14 -42 10";
+  const rightSpiral = "M84 -8 C96 18 74 42 42 42 C8 42 -10 12 8 -12 C24 -33 56 -27 57 -2 C58 15 34 21 25 8 C18 -3 29 -14 42 -10";
   return `
     <g filter="url(#threadShadow)">
-      ${threadPath("M-118 -34 C-87 -62 -57 -62 -28 -34 S27 -7 57 -34 S105 -61 130 -39", colors.secondary, 7.6, texture)}
-      ${threadPath("M-121 5 C-87 -27 -47 -27 -12 5 S50 41 92 7", colors.primary, 7.6, texture)}
-      ${continuousPath("M-102 45 C-66 18 -31 18 5 45 S67 72 106 39", colors.accent, 5.2)}
-      ${continuousPath("M-93 -4 H-67 V20 H-42 M-14 -39 H13 V-15 H37 M35 38 H61 V58 H89", colors.light, 2.8, `opacity="0.5"`)}
-      ${motifDiamond(-106, 5, 3.6, colors.secondary, 0.74)}
-      ${motifDiamond(119, -38, 3.6, colors.primary, 0.74)}
+      <path d="${leftSpiral}" fill="none" stroke="${colors.secondary}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.16" />
+      <path d="${rightSpiral}" fill="none" stroke="${colors.primary}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.16" />
+      ${threadPath(leftSpiral, colors.secondary, 7.2, texture)}
+      ${threadPath(rightSpiral, colors.primary, 7.2, texture)}
+      ${continuousPath("M-24 -8 C-5 -28 26 -28 44 -8 M-44 8 C-25 28 6 28 24 8", colors.accent, 4.2, `opacity="0.78"`)}
+      ${continuousPath("M-108 38 C-76 16 -45 18 -18 40 M18 -40 C45 -18 76 -16 108 -38", colors.light, 2.8, `opacity="0.54"`)}
+      ${motifDiamond(-72, -34, 3.6, colors.light, 0.72)}
+      ${motifDiamond(72, 34, 3.6, colors.light, 0.72)}
+      ${motifDot(-40, 8, 2.6, colors.accent, 0.74)}
+      ${motifDot(40, -8, 2.6, colors.accent, 0.74)}
     </g>
   `;
 }
