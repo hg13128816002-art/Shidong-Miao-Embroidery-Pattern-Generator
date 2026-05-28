@@ -590,8 +590,19 @@ input:focus-visible {
   padding: 8px 0 0;
 }
 
-.stage-toolbar strong,
-.stage-toolbar span {
+.stage-title-group {
+  min-width: 0;
+}
+
+.stage-title-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stage-title-group > span,
+.stage-toolbar strong {
   display: block;
 }
 
@@ -599,6 +610,12 @@ input:focus-visible {
   color: var(--ink);
   font-size: clamp(22px, 2.5vw, 30px);
   line-height: 1.1;
+}
+
+.stage-score-button {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
 }
 
 .icon-button {
