@@ -225,6 +225,7 @@ let toastTimer = null;
 let activeControlTab = "preset";
 let patternAnimationTimer = null;
 let generationTimer = null;
+let scoreAbortController = null;
 const THEME_STORAGE_KEY = "miao-theme";
 const systemThemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
@@ -251,10 +252,17 @@ const elements = {
   pieceMeta: document.querySelector("#pieceMeta"),
   randomizeButton: document.querySelector("#randomizeButton"),
   downloadButton: document.querySelector("#downloadButton"),
+  scoreButton: document.querySelector("#scoreButton"),
   shareButton: document.querySelector("#shareButton"),
   resetButton: document.querySelector("#resetButton"),
   toast: document.querySelector("#toast"),
   themeButton: document.querySelector("#themeButton"),
+  scoreDialog: document.querySelector("#scoreDialog"),
+  scorePanel: document.querySelector("#scorePanel"),
+  scoreCloseButton: document.querySelector("#scoreCloseButton"),
+  scoreCloseTargets: document.querySelectorAll("[data-score-close]"),
+  scoreStatus: document.querySelector("#scoreStatus"),
+  scoreResult: document.querySelector("#scoreResult"),
 };
 
 init();
@@ -469,8 +477,14 @@ function bindEvents() {
     showToast("已恢复初始纹样");
   });
   elements.downloadButton.addEventListener("click", downloadPng);
+  elements.scoreButton.addEventListener("click", scorePattern);
   elements.shareButton.addEventListener("click", copyShareLink);
   elements.themeButton.addEventListener("click", toggleTheme);
+  elements.scoreCloseButton.addEventListener("click", closeScoreDialog);
+  elements.scoreCloseTargets.forEach((target) => target.addEventListener("click", closeScoreDialog));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !elements.scoreDialog.hidden) closeScoreDialog();
+  });
 }
 
 function renderApp(updateUrl = true) {
@@ -1338,42 +1352,165 @@ async function copyShareLink() {
   }
 }
 
-function downloadPng() {
-  const svg =
-    elements.patternOutput.querySelector(".pattern-card-in svg") ||
-    elements.patternOutput.querySelector(".pattern-card-current svg") ||
-    elements.patternOutput.querySelector("svg");
+async function scorePattern() {
+  const svg = getCurrentPatternSvg();
+  if (!svg || elements.scoreButton.disabled) return;
+
+  openScoreDialog();
+  setScoreState("loading");
+  elements.scoreButton.disabled = true;
+  scoreAbortController?.abort();
+  scoreAbortController = new AbortController();
+
+  try {
+    const image = await svgToPngDataUrl(svg, 1200);
+    const response = await fetch("/api/score-pattern", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image, metadata: getScoreMetadata() }),
+      signal: scoreAbortController.signal,
+    });
+
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(payload?.error || "AI 评分暂时不可用");
+
+    renderScoreResult(payload);
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      setScoreState("error", error.message || "AI 评分失败，请稍后再试");
+    }
+  } finally {
+    elements.scoreButton.disabled = false;
+    scoreAbortController = null;
+  }
+}
+
+function openScoreDialog() {
+  elements.scoreDialog.hidden = false;
+  requestAnimationFrame(() => elements.scoreDialog.classList.add("is-open"));
+  elements.scorePanel.focus({ preventScroll: true });
+}
+
+function closeScoreDialog() {
+  scoreAbortController?.abort();
+  elements.scoreDialog.classList.remove("is-open");
+  window.setTimeout(() => {
+    elements.scoreDialog.hidden = true;
+  }, 160);
+}
+
+function setScoreState(stateName, message = "AI 正在观察纹样...") {
+  elements.scoreStatus.className = `score-status is-${stateName}`;
+  elements.scoreStatus.innerHTML =
+    stateName === "loading"
+      ? '<span class="loading-ring" aria-hidden="true"></span><span>AI 正在观察纹样...</span>'
+      : escapeHtml(message);
+  elements.scoreResult.innerHTML = "";
+}
+
+function renderScoreResult(result) {
+  const score = clamp(Math.round(Number(result.score) || 88), 80, 100);
+  const strengths = Array.isArray(result.strengths) ? result.strengths.slice(0, 3) : [];
+  const suggestions = Array.isArray(result.suggestions) ? result.suggestions.slice(0, 3) : [];
+
+  elements.scoreStatus.className = "score-status is-done";
+  elements.scoreStatus.textContent = "评分完成";
+  elements.scoreResult.innerHTML = `
+    <div class="score-value"><strong>${score}</strong><span>/100</span></div>
+    <h3>${escapeHtml(result.title || "这是一组完成度较高的苗绣数字纹样")}</h3>
+    <p>${escapeHtml(result.summary || "整体构图稳定，纹样元素之间有较清晰的呼应关系。")}</p>
+    ${renderScoreList("亮点", strengths)}
+    ${renderScoreList("建议", suggestions)}
+  `;
+}
+
+function renderScoreList(title, items) {
+  if (!items.length) return "";
+  return `
+    <section class="score-list">
+      <h4>${title}</h4>
+      <ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    </section>
+  `;
+}
+
+function getScoreMetadata() {
+  const layout = layouts.find((item) => item.id === state.layout) || layouts[0];
+  const texture = textures.find((item) => item.id === state.texture) || textures[0];
+  return {
+    seed: state.seed,
+    layout: layout.name,
+    palette: getPalette().name,
+    texture: texture.name,
+    motifs: state.motifs.map((id) => getMotif(id).name),
+    density: Number(state.density.toFixed(2)),
+    complexity: Number(state.complexity.toFixed(2)),
+    symmetry: state.symmetry,
+    border: state.border,
+  };
+}
+
+async function downloadPng() {
+  const svg = getCurrentPatternSvg();
   if (!svg) return;
 
-  const serializer = new XMLSerializer();
-  const source = serializer.serializeToString(svg);
-  const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const image = new Image();
-  const canvas = document.createElement("canvas");
-  const size = 1800;
-  canvas.width = size;
-  canvas.height = size;
-  const context = canvas.getContext("2d");
-
-  image.onload = () => {
-    context.fillStyle = "#fffdf8";
-    context.fillRect(0, 0, size, size);
-    context.drawImage(image, 0, 0, size, size);
-    URL.revokeObjectURL(url);
+  try {
+    const dataUrl = await svgToPngDataUrl(svg, 1800);
     const link = document.createElement("a");
     link.download = `shidong-miao-pattern-${state.seed}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = dataUrl;
     link.click();
     showToast("PNG 已生成");
-  };
-
-  image.onerror = () => {
-    URL.revokeObjectURL(url);
+  } catch {
     showToast("导出失败，请稍后再试");
-  };
+  }
+}
 
-  image.src = url;
+function getCurrentPatternSvg() {
+  return (
+    elements.patternOutput.querySelector(".pattern-card-in svg") ||
+    elements.patternOutput.querySelector(".pattern-card-current svg") ||
+    elements.patternOutput.querySelector("svg")
+  );
+}
+
+function svgToPngDataUrl(svg, size) {
+  return new Promise((resolve, reject) => {
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svg);
+    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    canvas.width = size;
+    canvas.height = size;
+
+    image.onload = () => {
+      context.fillStyle = "#fffdf8";
+      context.fillRect(0, 0, size, size);
+      context.drawImage(image, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/png"));
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("PNG export failed"));
+    };
+
+    image.src = url;
+  });
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function showToast(message) {

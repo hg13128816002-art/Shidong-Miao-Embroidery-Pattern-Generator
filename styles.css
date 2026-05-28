@@ -263,6 +263,13 @@ input:focus-visible {
   opacity: 0.86;
 }
 
+.button:disabled,
+.icon-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
 .loading-ring {
   width: 24px;
   height: 24px;
@@ -866,6 +873,172 @@ input:focus-visible {
   line-height: 1.65;
 }
 
+.score-dialog[hidden] {
+  display: none;
+}
+
+.score-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.score-dialog.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.score-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 9, 8, 0.74);
+}
+
+:root[data-theme="light"] .score-backdrop {
+  background: rgba(33, 23, 18, 0.42);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .score-backdrop {
+    background: rgba(33, 23, 18, 0.42);
+  }
+}
+
+.score-panel {
+  position: relative;
+  width: min(540px, 100%);
+  max-height: min(720px, calc(100vh - 48px));
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  transform: translateY(12px) scale(0.98);
+  transition: transform 180ms ease;
+}
+
+.score-dialog.is-open .score-panel {
+  transform: translateY(0) scale(1);
+}
+
+.score-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  padding: 0;
+  font-size: 22px;
+}
+
+.score-kicker {
+  margin: 0 48px 8px 0;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.score-panel h2 {
+  margin: 0 48px 18px 0;
+  font-size: 26px;
+  line-height: 1.18;
+}
+
+.score-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.score-status.is-loading {
+  color: var(--ink);
+}
+
+.score-status.is-error {
+  color: var(--carmine);
+}
+
+.score-status .loading-ring {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-color: rgba(208, 163, 73, 0.28);
+  border-top-color: var(--gold);
+}
+
+.score-result {
+  margin-top: 20px;
+}
+
+.score-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: var(--gold);
+}
+
+.score-value strong {
+  font-size: 58px;
+  line-height: 0.95;
+}
+
+.score-value span {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.score-result h3 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.score-result p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.score-list {
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.score-list h4 {
+  margin: 0 0 10px;
+  color: var(--teal);
+  font-size: 14px;
+}
+
+.score-list ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
 .toast {
   position: fixed;
   left: 50%;
@@ -1162,6 +1335,24 @@ input:focus-visible {
   .top-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .score-dialog {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .score-panel {
+    max-height: calc(100vh - 24px);
+    padding: 20px;
+  }
+
+  .score-panel h2 {
+    font-size: 23px;
+  }
+
+  .score-value strong {
+    font-size: 48px;
   }
 
   .panel,

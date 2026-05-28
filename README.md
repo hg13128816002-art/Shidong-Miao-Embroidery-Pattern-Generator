@@ -10,14 +10,34 @@ npm run dev
 
 打开 `http://localhost:5173`。
 
+普通静态服务只会运行前端页面；如果要在本地调试 AI 评分接口，请使用 Vercel 本地服务：
+
+```bash
+vercel dev
+```
+
 ## 当前功能
 
-- 8 类纹样元素：龙纹、鱼纹、蝴蝶纹、鸟纹、花纹、水纹、牛角纹、人物纹
-- 4 种构图：团花、四方连续、围腰、清水江
+- 9 类纹样元素：龙纹、鱼纹、蝴蝶纹、鸟纹、花纹、水涡纹、牛角纹、人物纹、枫香树纹
+- 4 种构图：团花、连续、围腰、清水江
 - 5 套色板：节庆红、清水江、母花素稿、银饰映红、姊妹节
 - 4 种质感：双针锁绣感、破线绣感、叠绣感、织锦颗粒
-- 随机生成、参数化分享链接、PNG 下载
+- 随机生成、参数化分享链接、PNG 下载、AI 评分
 - 根据当前纹样组合展示文化说明
+
+## AI 评分配置
+
+AI 评分通过 Vercel Serverless Function 调用模型，API key 只配置在服务端环境变量中，不要写进前端代码。
+
+本地调试可复制 `.env.example` 为 `.env.local`，然后填写：
+
+```bash
+OPENAI_API_KEY=你的_API_Key
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
+```
+
+如果使用的是 OpenAI 兼容接口，把 `OPENAI_BASE_URL` 和 `OPENAI_MODEL` 改成服务商提供的地址和模型名即可。
 
 ## 上线方式
 
@@ -28,6 +48,7 @@ Vercel 推荐设置：
 - Framework Preset: `Other`
 - Build Command: 留空
 - Output Directory: `.`
+- Environment Variables: 添加 `OPENAI_API_KEY`，可选添加 `OPENAI_MODEL`、`OPENAI_BASE_URL`
 
 ## 文化与版权说明
 

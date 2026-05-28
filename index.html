@@ -43,6 +43,10 @@
             <span aria-hidden="true">↓</span>
             下载 PNG
           </button>
+          <button class="button" id="scoreButton" type="button">
+            <span aria-hidden="true">✦</span>
+            AI 评分
+          </button>
           <button class="button" id="shareButton" type="button">
             <span aria-hidden="true">↗</span>
             分享
@@ -153,6 +157,19 @@
         </aside>
       </main>
 
+    </div>
+
+    <div class="score-dialog" id="scoreDialog" hidden>
+      <div class="score-backdrop" data-score-close></div>
+      <section class="score-panel" id="scorePanel" role="dialog" aria-modal="true" aria-labelledby="scoreTitle" tabindex="-1">
+        <button class="icon-button score-close" id="scoreCloseButton" type="button" aria-label="关闭 AI 评分窗口" title="关闭">
+          ×
+        </button>
+        <p class="score-kicker">AI 纹样评审</p>
+        <h2 id="scoreTitle">生成纹样评分</h2>
+        <div class="score-status" id="scoreStatus" role="status">点击 AI 评分后查看结果</div>
+        <div class="score-result" id="scoreResult"></div>
+      </section>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
