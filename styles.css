@@ -624,6 +624,10 @@ input:focus-visible {
   background: var(--teal-deep);
 }
 
+.stage-score-button span {
+  color: currentColor;
+}
+
 .icon-button {
   width: 40px;
   padding: 0;
