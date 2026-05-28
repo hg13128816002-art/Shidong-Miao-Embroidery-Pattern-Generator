@@ -1363,7 +1363,7 @@ async function scorePattern() {
   scoreAbortController = new AbortController();
 
   try {
-    const image = await svgToPngDataUrl(svg, 1200);
+    const image = await svgToPngDataUrl(svg, 768);
     const response = await fetch("/api/score-pattern", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

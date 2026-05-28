@@ -43,7 +43,7 @@ Novita 示例：
 
 ```bash
 OPENAI_API_KEY=你的_Novita_API_Key
-OPENAI_MODEL=qwen/qwen2.5-vl-72b-instruct
+OPENAI_MODEL=qwen/qwen3-vl-8b-instruct
 OPENAI_BASE_URL=https://api.novita.ai/openai/v1
 ```
 

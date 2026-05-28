@@ -42,6 +42,7 @@ module.exports = async function scorePattern(req, res) {
                 type: "image_url",
                 image_url: {
                   url: image,
+                  detail: "low",
                 },
               },
             ],
