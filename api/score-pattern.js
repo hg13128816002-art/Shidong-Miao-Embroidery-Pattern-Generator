@@ -47,7 +47,7 @@ module.exports = async function scorePattern(req, res) {
             ],
           },
         ],
-        temperature: 0.35,
+        temperature: 0.55,
         max_tokens: 700,
       }),
     });
@@ -82,7 +82,7 @@ function isValidPngDataUrl(value) {
 
 function buildPrompt(metadata) {
   const compactMetadata = JSON.stringify(metadata, null, 2);
-  return `你是一个面向公众体验的施洞苗绣数字纹样评审助手。请先观察用户生成的纹样图片，再结合以下生成参数进行评价：\n${compactMetadata}\n\n请从构图秩序、纹样清晰度、色彩协调、苗绣视觉语言贴合度、个性化完成度五个角度给出友好但具体的评价。最终分数必须限制在 80 到 100 之间。只返回 JSON，不要返回 Markdown，不要添加额外说明。JSON 结构如下：\n{\n  "score": 92,\n  "title": "一句短标题",\n  "summary": "两到三句话的总体评价",\n  "strengths": ["亮点 1", "亮点 2", "亮点 3"],\n  "suggestions": ["建议 1", "建议 2"]\n}`;
+  return `你是一个面向公众体验的施洞苗绣数字纹样评审助手。请先观察用户生成的纹样图片，再结合以下生成参数进行评价：\n${compactMetadata}\n\n评分必须根据当前图片的真实观感变化，不要默认给中间高分，也不要重复使用同一个分数。请从构图秩序、纹样清晰度、色彩协调、苗绣视觉语言贴合度、个性化完成度五个角度综合判断。\n\n评分标尺：\n- 80-84：画面可用，但秩序、主题或色彩存在明显问题。\n- 85-89：整体成立，有一定美感，但局部拥挤、松散或文化特征不够明确。\n- 90-94：完成度较好，构图和纹样关系清楚，适合展示。\n- 95-100：非常成熟，主体突出、层次丰富、节奏稳定，并且有鲜明的苗绣视觉气质。\n\n请输出严格 JSON，不要返回 Markdown，不要添加额外说明。JSON 字段必须是：score、title、summary、strengths、suggestions。score 必须是 80 到 100 之间的整数。`;
 }
 
 function extractOutputText(data) {
