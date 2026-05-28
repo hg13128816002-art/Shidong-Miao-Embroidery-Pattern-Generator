@@ -39,6 +39,14 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 
 如果使用的是 OpenAI 兼容接口，把 `OPENAI_BASE_URL` 和 `OPENAI_MODEL` 改成服务商提供的地址和模型名即可。
 
+Novita 示例：
+
+```bash
+OPENAI_API_KEY=你的_Novita_API_Key
+OPENAI_MODEL=qwen/qwen2.5-vl-72b-instruct
+OPENAI_BASE_URL=https://api.novita.ai/openai/v1
+```
+
 ## 上线方式
 
 这是静态网页，可以直接部署到 Vercel、Netlify、GitHub Pages 或任意静态托管服务。

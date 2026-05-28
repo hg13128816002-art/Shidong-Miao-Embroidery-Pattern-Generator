@@ -22,7 +22,7 @@ module.exports = async function scorePattern(req, res) {
   try {
     const model = process.env.OPENAI_MODEL || DEFAULT_MODEL;
     const baseUrl = (process.env.OPENAI_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, "");
-    const response = await fetch(`${baseUrl}/responses`, {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,21 +30,25 @@ module.exports = async function scorePattern(req, res) {
       },
       body: JSON.stringify({
         model,
-        input: [
+        messages: [
           {
             role: "user",
             content: [
               {
-                type: "input_text",
+                type: "text",
                 text: buildPrompt(metadata),
               },
               {
-                type: "input_image",
-                image_url: image,
+                type: "image_url",
+                image_url: {
+                  url: image,
+                },
               },
             ],
           },
         ],
+        temperature: 0.35,
+        max_tokens: 700,
       }),
     });
 
@@ -82,6 +86,9 @@ function buildPrompt(metadata) {
 }
 
 function extractOutputText(data) {
+  const chatContent = data.choices?.[0]?.message?.content;
+  if (typeof chatContent === "string") return chatContent;
+
   if (typeof data.output_text === "string") return data.output_text;
 
   const chunks = [];
