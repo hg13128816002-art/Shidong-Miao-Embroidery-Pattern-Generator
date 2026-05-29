@@ -23,6 +23,7 @@ vercel dev
 - 5 套色板：节庆红、清水江、母花素稿、银饰映红、姊妹节
 - 4 种质感：双针锁绣感、破线绣感、叠绣感、织锦颗粒
 - 随机生成、参数化分享链接、PNG 下载、AI 评分
+- 用户反馈提交，反馈会写入 Vercel Function Logs
 - 根据当前纹样组合展示文化说明
 
 ## AI 评分配置
@@ -57,6 +58,18 @@ Vercel 推荐设置：
 - Build Command: 留空
 - Output Directory: `.`
 - Environment Variables: 添加 `OPENAI_API_KEY`，可选添加 `OPENAI_MODEL`、`OPENAI_BASE_URL`
+
+## 查看用户反馈
+
+用户在网页里提交反馈后，内容会写入 Vercel 后台日志。查看路径：
+
+`Vercel 项目 → Logs`，搜索：
+
+```text
+[USER_FEEDBACK]
+```
+
+当前方案不需要数据库，适合先收集测试反馈；如果后续需要长期留存，可以再接入数据库、飞书或邮箱通知。
 
 ## 文化与版权说明
 

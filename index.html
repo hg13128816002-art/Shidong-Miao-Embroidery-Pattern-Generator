@@ -47,6 +47,10 @@
             <span aria-hidden="true">↗</span>
             分享
           </button>
+          <button class="button" id="feedbackButton" type="button">
+            <span aria-hidden="true">✎</span>
+            反馈
+          </button>
         </div>
       </header>
 
@@ -171,6 +175,35 @@
         <h2 id="scoreTitle">生成纹样评分</h2>
         <div class="score-status" id="scoreStatus" role="status">点击 AI 评分后查看结果</div>
         <div class="score-result" id="scoreResult"></div>
+      </section>
+    </div>
+
+    <div class="score-dialog feedback-dialog" id="feedbackDialog" hidden>
+      <div class="score-backdrop" data-feedback-close></div>
+      <section class="score-panel feedback-panel" id="feedbackPanel" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" tabindex="-1">
+        <button class="icon-button score-close" id="feedbackCloseButton" type="button" aria-label="关闭反馈窗口" title="关闭">
+          ×
+        </button>
+        <p class="score-kicker">用户反馈</p>
+        <h2 id="feedbackTitle">留下你的想法</h2>
+        <form class="feedback-form" id="feedbackForm">
+          <label>
+            <span>评论内容</span>
+            <textarea id="feedbackMessage" name="message" rows="5" maxlength="800" required placeholder="可以说说你喜欢哪里，哪里不好用，或者希望增加什么功能。"></textarea>
+          </label>
+          <label>
+            <span>联系方式（可选）</span>
+            <input id="feedbackContact" name="contact" type="text" maxlength="120" placeholder="邮箱、微信或其他联系方式" />
+          </label>
+          <label class="feedback-honeypot" aria-hidden="true">
+            <span>Website</span>
+            <input id="feedbackWebsite" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+          <div class="feedback-actions">
+            <p id="feedbackStatus" role="status" aria-live="polite"></p>
+            <button class="button button-primary" id="feedbackSubmitButton" type="submit">提交反馈</button>
+          </div>
+        </form>
       </section>
     </div>
 

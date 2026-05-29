@@ -254,6 +254,7 @@ const elements = {
   downloadButton: document.querySelector("#downloadButton"),
   scoreButton: document.querySelector("#scoreButton"),
   shareButton: document.querySelector("#shareButton"),
+  feedbackButton: document.querySelector("#feedbackButton"),
   resetButton: document.querySelector("#resetButton"),
   toast: document.querySelector("#toast"),
   themeButton: document.querySelector("#themeButton"),
@@ -263,6 +264,16 @@ const elements = {
   scoreCloseTargets: document.querySelectorAll("[data-score-close]"),
   scoreStatus: document.querySelector("#scoreStatus"),
   scoreResult: document.querySelector("#scoreResult"),
+  feedbackDialog: document.querySelector("#feedbackDialog"),
+  feedbackPanel: document.querySelector("#feedbackPanel"),
+  feedbackCloseButton: document.querySelector("#feedbackCloseButton"),
+  feedbackCloseTargets: document.querySelectorAll("[data-feedback-close]"),
+  feedbackForm: document.querySelector("#feedbackForm"),
+  feedbackMessage: document.querySelector("#feedbackMessage"),
+  feedbackContact: document.querySelector("#feedbackContact"),
+  feedbackWebsite: document.querySelector("#feedbackWebsite"),
+  feedbackStatus: document.querySelector("#feedbackStatus"),
+  feedbackSubmitButton: document.querySelector("#feedbackSubmitButton"),
 };
 
 init();
@@ -479,11 +490,16 @@ function bindEvents() {
   elements.downloadButton.addEventListener("click", downloadPng);
   elements.scoreButton.addEventListener("click", scorePattern);
   elements.shareButton.addEventListener("click", copyShareLink);
+  elements.feedbackButton.addEventListener("click", openFeedbackDialog);
   elements.themeButton.addEventListener("click", toggleTheme);
   elements.scoreCloseButton.addEventListener("click", closeScoreDialog);
   elements.scoreCloseTargets.forEach((target) => target.addEventListener("click", closeScoreDialog));
+  elements.feedbackCloseButton.addEventListener("click", closeFeedbackDialog);
+  elements.feedbackCloseTargets.forEach((target) => target.addEventListener("click", closeFeedbackDialog));
+  elements.feedbackForm.addEventListener("submit", submitFeedback);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !elements.scoreDialog.hidden) closeScoreDialog();
+    if (event.key === "Escape" && !elements.feedbackDialog.hidden) closeFeedbackDialog();
   });
 }
 
@@ -1397,6 +1413,65 @@ function closeScoreDialog() {
   window.setTimeout(() => {
     elements.scoreDialog.hidden = true;
   }, 160);
+}
+
+function openFeedbackDialog() {
+  elements.feedbackDialog.hidden = false;
+  elements.feedbackStatus.textContent = "";
+  requestAnimationFrame(() => elements.feedbackDialog.classList.add("is-open"));
+  elements.feedbackPanel.focus({ preventScroll: true });
+}
+
+function closeFeedbackDialog() {
+  elements.feedbackDialog.classList.remove("is-open");
+  window.setTimeout(() => {
+    elements.feedbackDialog.hidden = true;
+  }, 160);
+}
+
+async function submitFeedback(event) {
+  event.preventDefault();
+
+  const message = elements.feedbackMessage.value.trim();
+  const contact = elements.feedbackContact.value.trim();
+  const website = elements.feedbackWebsite.value.trim();
+
+  if (website) {
+    closeFeedbackDialog();
+    return;
+  }
+
+  if (message.length < 2) {
+    elements.feedbackStatus.textContent = "请先写一点反馈内容。";
+    return;
+  }
+
+  elements.feedbackSubmitButton.disabled = true;
+  elements.feedbackStatus.textContent = "正在提交...";
+
+  try {
+    const response = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        contact,
+        page: window.location.href,
+        pattern: getScoreMetadata(),
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(payload?.error || "反馈提交失败");
+
+    elements.feedbackForm.reset();
+    closeFeedbackDialog();
+    showToast("感谢反馈，已经收到");
+  } catch (error) {
+    elements.feedbackStatus.textContent = error.message || "提交失败，请稍后再试。";
+  } finally {
+    elements.feedbackSubmitButton.disabled = false;
+  }
 }
 
 function setScoreState(stateName, message = "AI 正在观察纹样...") {
