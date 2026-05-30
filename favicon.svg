@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="施洞苗绣纹样生成器图标">
+  <rect width="64" height="64" fill="#171211"/>
+  <rect x="7" y="7" width="50" height="50" fill="#211917" stroke="#b88525" stroke-width="3"/>
+  <rect x="11" y="11" width="42" height="42" fill="none" stroke="#1d746d" stroke-width="2"/>
+  <rect x="15" y="15" width="34" height="34" fill="none" stroke="#9f2338" stroke-width="2"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 13 C38 20 38 27 32 32 C26 27 26 20 32 13Z" stroke="#f0c35b" stroke-width="3"/>
+    <path d="M32 51 C26 44 26 37 32 32 C38 37 38 44 32 51Z" stroke="#f0c35b" stroke-width="3"/>
+    <path d="M13 32 C20 26 27 26 32 32 C27 38 20 38 13 32Z" stroke="#1d746d" stroke-width="3"/>
+    <path d="M51 32 C44 38 37 38 32 32 C37 26 44 26 51 32Z" stroke="#1d746d" stroke-width="3"/>
+    <path d="M19 19 C27 18 31 24 32 32 C24 31 18 27 19 19Z" stroke="#9f2338" stroke-width="3"/>
+    <path d="M45 19 C46 27 40 31 32 32 C33 24 37 18 45 19Z" stroke="#9f2338" stroke-width="3"/>
+    <path d="M19 45 C18 37 24 33 32 32 C31 40 27 46 19 45Z" stroke="#9f2338" stroke-width="3"/>
+    <path d="M45 45 C37 46 33 40 32 32 C40 33 46 37 45 45Z" stroke="#9f2338" stroke-width="3"/>
+  </g>
+  <circle cx="32" cy="32" r="5" fill="#f7ead4"/>
+  <circle cx="32" cy="32" r="2.4" fill="#9f2338"/>
+</svg>
